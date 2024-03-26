@@ -10,6 +10,7 @@
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
+    "electron-is-dev": "^3.0.1",
     "eslint": "^8.57.0",
     "prettier": "^3.2.5",
     "react": "^18.2.0",
@@ -20,14 +21,15 @@
     "web-vitals": "^2.1.4",
     "zustand": "^4.5.2"
   },
-  "main": "src/main.js",
+  "main": "public/main.js",
+  "homepage": "./",
   "scripts": {
-    "start": "concurrently \"npm run react:start\" \"npm run electron:start\"",
-    "react:start": "react-scripts start",
-    "electron:start": "wait-on http://localhost:3000 && electron .",
+    "start": "concurrently \"react-scripts start\" \"npm run electron\" ",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "electron": "wait-on http://localhost:3000 && electron .",
+    "pack": "npm run build && electron-builder build -c.extraMetadata.main=build/main.js"
   },
   "eslintConfig": {
     "extends": [
@@ -49,6 +51,7 @@
   },
   "devDependencies": {
     "electron": "^29.1.4",
+    "electron-builder": "^24.13.3",
     "wait-on": "^7.2.0"
   }
 }
