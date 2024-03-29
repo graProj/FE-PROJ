@@ -1,31 +1,30 @@
 const { app, BrowserWindow } = require("electron");
 const path = require("path");
+const robot = require("@hurdlegroup/robotjs");
 
 let win;
 
 function createWindow() {
-  // 동적 import를 통해 electron-is-dev 모듈을 가져옵니다.
-  import('electron-is-dev').then((isDev) => {
-    win = new BrowserWindow({
-      width: 800,
-      height: 600,
-      webPreferences: {
-        nodeIntegration: true,
-      },
-    });
-
-    win.loadURL(
-      isDev.default // import로 가져온 모듈은 .default로 접근합니다.
-        ? "http://localhost:3000"
-        : `file://${path.join(__dirname, "../build/index.html")}`
-    );
-
-    win.on("closed", function () {
-      win = null;
-    });
-  }).catch((err) => {
-    console.error("Error loading electron-is-dev module:", err);
+  win = new BrowserWindow({
+    width: 800,
+    height: 600,
+    webPreferences: {
+      nodeIntegration: true,
+    },
   });
+
+  win.loadURL(`file://${path.join(__dirname, "../build/index.html")}`);
+
+  win.on("closed", function () {
+    win = null;
+  });
+
+  // 마우스 클릭 코드와 콘솔 출력 추가
+  setTimeout(() => {
+    console.log("마우스 클릭을 수행하기 전");
+    robot.mouseClick();
+    console.log("마우스 클릭을 수행한 후");
+  }, 7000);
 }
 
 app.whenReady().then(createWindow);
