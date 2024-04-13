@@ -1,24 +1,48 @@
 import React from 'react';
-import styled, { css } from 'styled-components';
+import styles, { css } from 'styled-components';
 
-export default function Menu({ isClose }) {
+export default function Menu({ isclose }) {
+  
   return (
-    <Container isclose={isClose}>
-      {/* 내용 */}
+    <Container isclose={!isclose}>
+        <H1>메 뉴</H1>
+      
+      <Category>
+        <h3>awef</h3>
+        <h3>awef</h3>
+        <h3>awef</h3>
+        <h3>awef</h3>
+      </Category>
     </Container>
   );
 }
 
-const Container = styled.div`
-  position: absolute;
-  height: 100vh;
-  width: 25%;
-  background-color: blue;
+const Container = styles.div`
+  position: fixed;
+  top: 0;
+  left:0;
+  height: 100%;
+  width: 35%;
+  background-color: #040d12d8;
+  display:flex;
+  flex-direction:column;
+  align-items:space-between;
+  padding:20px;
+  color:white;
+  text-align:center;
   z-index: 99;
-  /* isClose가 true이면 display: none을 적용 */
   ${props =>
-    props.isClose &&
+    props.isclose && // 수정된 부분
     css`
       display: none;
     `}
 `;
+const Category = styles.div`
+  width:100%;
+  height:80vh;
+  display: flex;
+  flex-direction:column;
+`
+const H1 = styles.h1`
+padding:20px;
+`

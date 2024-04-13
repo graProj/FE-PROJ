@@ -3,15 +3,15 @@ import styles from 'styled-components'
 import Menu from './menu'
 
 export default function Header() {
-  const [isClickMenu, setIsClickMenu] = useState(false)
+  const [isClickMenu, setIsClickMenu] = useState(false);
   const MenuHandler  = ()=>{
-    setIsClickMenu(!isClickMenu)    
+    setIsClickMenu(!isClickMenu)
   }
   return (
     <Container>
       <Logo/>
-      <button onClick={MenuHandler}>awef</button>
-      <Menu isclose ={isClickMenu}/>
+      <button onClick={MenuHandler}>awefaeaef</button>
+      <Menu isclose={isClickMenu ? true : false} />
       <Icons/>
     </Container>
   )
