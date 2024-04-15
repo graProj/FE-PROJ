@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { io } from "socket.io-client";
 export default function Home() {
   const socket = io("http://3.39.22.211:5004/");
-  const room = "didacto3";
+  const room = "didacto";
   const configuration = {
     iceServers: [
       {
@@ -121,6 +121,7 @@ export default function Home() {
   return (
     <div id="box">
       <div id="result"></div>
+      <input type="text" />
       <video id="myFace" playsInline autoPlay width="600" height="600"></video>
       <a href="/">Home</a>
       <video
