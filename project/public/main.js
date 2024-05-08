@@ -2,9 +2,10 @@ const { app, BrowserWindow, ipcMain, desktopCapturer } = require('electron/main'
 const path = require('node:path')
 const robot = require("@hurdlegroup/robotjs");
 
-let mainWindow
+const io = require("socket.io-client")("http://3.39.22.211:5004/");
 
 app.whenReady().then(() => {
+
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -23,27 +24,41 @@ app.whenReady().then(() => {
         event.returnValue = source.id
       }
   }});
-const text = "개 피곤하다"
-  setTimeout(() => {
-    const screenSize = robot.getScreenSize();
-    let centerX = screenSize.width / 2;
-    let centerY = screenSize.height / 2;
-    robot.moveMouse(centerX, centerY);
-    centerX = 558 
-    centerY = 640
-    robot.scrollMouse(500, 0);
-    robot.moveMouseSmooth(centerX, centerY);
-    setTimeout(() => {
-      robot.mouseClick();
-      for (let i = 0; i < text.length; i++) {
-        setTimeout((char) => {
-            robot.typeString(char);
-            console.log(char);
-        }, 200 * i, text[i]);
-    }
-  }, 500);
+  ipcMain.on('remote-coordinates', (event, coordinates) => {
+ 
+    let { remoteX, remoteY } = coordinates;
+    robot.moveMouse(remoteX, remoteY);
+    robot.mouseClick();
+
+  });
+  ipcMain.on('remote-keyPress', (event, asciiKeyCode) => {
+    const pressedKey = String.fromCharCode(parseInt(asciiKeyCode)); // 아스키 코드를 문자열로 변환
+    console.log('Pressed key:', pressedKey);
+    robot.typeString(pressedKey);
+    // 여기서 pressedKey 변수를 원하는 대로 처리할 수 있습니다.
+  });
+// const text = "원격 테스트"
+//   setTimeout(() => {
+//     const screenSize = robot.getScreenSize();
+//     let centerX = screenSize.width / 2;
+//     let centerY = screenSize.height / 2;
+//     robot.moveMouse(centerX, centerY);
+//     centerX = 558 
+//     centerY = 640
+//     robot.scrollMouse(500, 0);
+//     robot.moveMouseSmooth(centerX, centerY);
+//     setTimeout(() => {
+//       robot.mouseClick();
+//       for (let i = 0; i < text.length; i++) {
+//         setTimeout((char) => {
+//             robot.typeString(char);
+//             console.log(char);
+//         }, 200 * i, text[i]);
+//     }
+//   }, 500);
   
-  }, 5000);
+//   }, 5000);
+
 });
 
 
