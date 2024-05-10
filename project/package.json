@@ -8,8 +8,10 @@
     "@hurdlegroup/robotjs": "^0.11.4",
     "@mui/icons-material": "^5.15.16",
     "@mui/material": "^5.15.16",
+    "@tanstack/query-sync-storage-persister": "^5.35.1",
     "@tanstack/react-query": "^5.26.3",
     "@tanstack/react-query-devtools": "^5.35.1",
+    "@tanstack/react-query-persist-client": "^5.35.1",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^13.4.0",
     "@testing-library/user-event": "^13.5.0",
@@ -26,7 +28,7 @@
     "web-vitals": "^2.1.4",
     "zustand": "^4.5.2"
   },
-  "main": "public/main.js",
+  "main": "build/main.js",
   "homepage": "./",
   "scripts": {
     "start": "concurrently \"react-scripts start\" \"npm run electron\" ",

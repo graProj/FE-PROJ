@@ -1,27 +1,26 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 import { Button } from '@mui/material';
 import { Add } from '@mui/icons-material';
-
 import Lecbox from './lecbox';
 import LectureModal from './modal';
 import LecInput from './lecinput';
-import LectureData from '../../api/lectureList';
+import useLectureData from '../../api/lectureList';
 import LoadingIndicator from '../../hooks/loading';
 
-
-
 function Lecture() {
-  const { data: lectureData, isLoading, error } = LectureData();
+  const { data, isLoading, error } = useLectureData();
 
   const [lectureBoxes, setLectureBoxes] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
 
-  const filteredBoxes = useMemo(() => {
-    return lectureData ? lectureData.filter(box => box.title.toLowerCase().includes(searchText.toLowerCase())) : [];
-  }, [lectureData, searchText]);
-  
+  useEffect(() => {
+    if (data && data.response && data.response.lectures) {
+      setLectureBoxes(data.response.lectures);
+    }
+  }, [data]);
+
   const handleSearch = (searchText) => {
     setSearchText(searchText);
   };
@@ -30,7 +29,7 @@ function Lecture() {
     const updatedLectureBoxes = lectureBoxes.filter(box => box.id !== id);
     setLectureBoxes(updatedLectureBoxes);
   };
-  
+  console.log(data)
   return (
     <Container>
       <Title>현재 강의 중인 목록</Title>
@@ -40,8 +39,8 @@ function Lecture() {
       {error && <div>Error: {error.message}</div>}
       {!isLoading && !error && (
         <LectureList>
-          {filteredBoxes.map((box) => (
-            <Lecbox key={box.id} boxId={box.id} text={box.title} onDelete={() => handleDeleteBox(box.id)} />
+          {lectureBoxes.filter(box => box.title.toLowerCase().includes(searchText.toLowerCase())).map((box) => (
+            <Lecbox key={box.id} name={box.owner.name} boxId={box.id} text={box.title} onDelete={() => handleDeleteBox(box.id)} />
           ))}
         </LectureList>
       )}

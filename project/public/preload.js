@@ -13,16 +13,15 @@ contextBridge.exposeInMainWorld('display', {
    
 })
 contextBridge.exposeInMainWorld('remote', {
-  source: (remoteX, remoteY) => {
+  source: (remoteX, remoteY, eventType) => {
     const width = window.screen.width * window.devicePixelRatio;
     const height = window.screen.height * window.devicePixelRatio;
     remoteX =  remoteX * (width/700);
     remoteY = remoteY*(height/(700*(height/ width)));
-    console.log(width)
-    console.log(height)
-    ipcRenderer.send('remote-coordinates', { remoteX, remoteY });
+    ipcRenderer.send('remote-coordinates', { remoteX, remoteY ,eventType });
   },
   key: (pressedKey) => { 
+    console.log(pressedKey.charCodeAt(0))
     ipcRenderer.send('remote-keyPress', pressedKey); //ressedKey를 직접 인자로 전달
   }
 });

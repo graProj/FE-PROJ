@@ -1,31 +1,22 @@
 import React, { useState } from 'react';
 import styled from 'styled-components';
-import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
-function postData(data) {
-    return axios.post('http://3.39.22.211/api/v1/enrollment', data);
+async function postData(data) {
+    return await axios.post('http://3.39.22.211/api/v1/enrollment', {'lectureId':data});
   }
 function LectureModal({ onClose }) {
   const [roomId, setroomId] = useState(0);
-  const { mutate, isLoading, isError } = useMutation(postData);
+
   
   const handleClose = () => {
     onClose(); 
   };
 
   const onChangeHandler = (e) => {
-    const changeId = e.target.value;
-    setroomId(changeId);
+    setroomId(e.target.value);
   };
-
   const onSubmitHandler = async () => {
-    try {
-      const response = await mutate({ roomId });
-      console.log('POST 요청 성공:', response.data);
-      onClose();
-    } catch (error) {
-      console.error('POST 요청 실패:', error);
-    }
+    postData(roomId);
   };
 
   return (
@@ -34,9 +25,8 @@ function LectureModal({ onClose }) {
         <Contents>
           <CloseButton onClick={handleClose}>X</CloseButton>
           <MainContext>
-            일단 스탑
             <input type="text" value={roomId} onChange={onChangeHandler} />
-            <button onClick={onSubmitHandler}>만들기</button>
+            <button onClick={onSubmitHandler}>신청하기</button>
           </MainContext>
         </Contents>
       </ModalContent>

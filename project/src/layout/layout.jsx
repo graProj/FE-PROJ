@@ -1,13 +1,27 @@
-import { Outlet} from "react-router-dom";
+import { Outlet, Navigate, useLocation} from "react-router-dom";
 import '../index.css';
 import Header from "../components/header";
-function Layout() {
-  return (
-    <>
-      <Header />
-      <Outlet />
-    </>
-  );
-}
 
-export default Layout;
+const ProtectedRoutes = () => {
+  const location = useLocation();
+  const localStorageToken = localStorage.getItem("token");
+  if (localStorageToken === undefined) {
+    return null; 
+  }
+  if (localStorageToken) {
+    return (
+      <>
+        <Header />
+        <Outlet />
+      </>
+    );
+  } else {
+    return (
+      <>
+        <Navigate to="/auth" replace state={{ from: location }} />
+      </>
+    );
+  }
+};
+
+export default ProtectedRoutes;

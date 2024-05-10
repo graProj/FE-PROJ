@@ -2,7 +2,11 @@ import React, { useEffect, useState } from 'react'
 import styles, { keyframes, styled } from 'styled-components'
 import Login from '../components/login/login';
 import JoinBox from '../components/login/signup';
+import { useNavigate } from 'react-router-dom';
+
+
 export default function Splash() {
+  const navigate = useNavigate()
   const [showSplashscreen, setShowSplashscreen] = useState(false);
   const [loginShow, setLoginShow] = useState(true);
   const token = localStorage.getItem('token');
@@ -10,8 +14,22 @@ export default function Splash() {
     setTimeout(() => {
       setShowSplashscreen(true);
     }, 3000);
-  }, [token]);
+  }, []);
+  useEffect(() => {
+    if (token) {
+      navigate('/');
+    }
+  }, [token, navigate]);
+  useEffect(() => { // 로그인했을때 auth 접근제한 + 로그인 후 리다이렉팅
+    const interval = setInterval(() => {
+      const newToken = localStorage.getItem('token');
+      if (newToken) {
+        navigate('/');
+      }
+    }, 1000);
 
+    return () => clearInterval(interval);
+  }, [navigate]);
   const changeShow = () =>{
     setLoginShow(!loginShow)
   }

@@ -4,6 +4,7 @@ import styled from 'styled-components';
 import LoadingIndicator from '../../hooks/loading';
 
 
+
 export default function Form() {
   const [formData, setFormData] = useState({
     email: "",
