@@ -2,23 +2,36 @@ import { createBrowserRouter } from 'react-router-dom';
 import Room from './pages/room';
 import Notfound from './pages/notfound';
 import Home from './pages/home';
-import Layout from './layout/layout';
 
+import Splash from './pages/splash';
+import PrivateRoutes from './layout/layout';
+import LectureRoom from './pages/lectureRoom';
 const router = createBrowserRouter([
   {
     path: '/',
-    element: <Layout/>,
-    errorElement: <Notfound />,
+    element: <PrivateRoutes />,
     children: [
       {
         path: '',
-        element: <Home />
+        element: <Home />,
       },
       {
         path: 'room',
         element: <Room />
       },
+      {
+        path: '/home/:id', 
+        element: <LectureRoom />
+      },
     ],
+  },
+  {
+    path: 'auth',
+    element: <Splash />
+  },
+  {
+    path: "*",
+    element: <Notfound />
   },
 ]);
 

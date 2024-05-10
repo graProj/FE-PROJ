@@ -1,15 +1,30 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App.jsx';
-import { QueryClient, QueryClientProvider} from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
+import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
+import { QueryClient } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
-const queryClient = new QueryClient()
+import './index.css';
+import App from './App.jsx';
+const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        gcTime: 1000 * 60 * 60 * 24, // 24 hours
+      },
+    },
+  })
+  
+  const persister = createSyncStoragePersister({
+    storage: window.localStorage,
+  })
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
-    <QueryClientProvider client={queryClient}>
+    <PersistQueryClientProvider
+    client={queryClient}
+    persistOptions={{ persister }}
+    >
         <App />
         <ReactQueryDevtools initialIsOpen={false} />
-    </QueryClientProvider>
+    </PersistQueryClientProvider>
 );

@@ -18,13 +18,16 @@ const signIn = async (formData, setLoading) => { // 로딩 상태를 매개변�
     } 
     const data = await response.json();
     console.log(data)
-    localStorage.setItem('token', data.response.accessToken);
-
+    if(data.response.accessToken){
+      localStorage.setItem('token', data
+      .response.accessToken);
+    }
     return data;
+    
   } catch (error) {
     throw error;
   } finally {
-    setLoading(false); // 로딩 종료
+    setLoading(false);// 로딩 종료
   }
 };
 

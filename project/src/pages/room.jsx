@@ -110,11 +110,12 @@ export default function Room() {
       });
       socket.on("remote-event", async (message) => {
         var content = JSON.parse(message);
+        
         if (content.event === "client_x_coordinate") {
-          console.log(content.data)
           if (typeof content.data === 'object') {
-            await window.remote.source(content.data.x, content.data.y);
-          } else if (content.data.length()<2) {
+            console.log(content.data)
+            await window.remote.source(content.data.x, content.data.y, content.data.eventType);
+          } else  {          
             await window.remote.key(content.data);
           }
           

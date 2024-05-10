@@ -1,8 +1,9 @@
+import { Delete } from '@mui/icons-material';
 import React from 'react';
 import styled from 'styled-components';
 
 
-function Lecbox({ onDelete , text, boxId}) {
+function Lecbox({ onDelete , text, boxId, name}) {
   const handleDelete = () => {
     onDelete();
   };
@@ -10,9 +11,9 @@ function Lecbox({ onDelete , text, boxId}) {
     window.location.href = `/home/${boxId}`
   }
   return (
-    <Container>
-      <button onClick={goRoom}><LecText>{text}</LecText></button>
-      <button onClick={handleDelete}>-</button>
+    <Container >
+      <Btn onClick={goRoom}><LecText><h2>{text}</h2><p>강의자 :{name}</p></LecText></Btn>
+      <button onClick={handleDelete}><Delete/></button>
     </Container>
   );
 }
@@ -27,8 +28,18 @@ const Container = styled.div`
   align-items: center;
   justify-content: space-between;
   background-color: #ffffff9a;
+  button{
+    background-color: transparent;
+    border: none;
+  }
 `;
-
+const Btn = styled.button`
+  background-color: transparent;
+    border: none;
+    width: 70%;
+    display: flex;
+    justify-content: center;
+`
 
 const LecText = styled.div`
   min-width: 100%; 
@@ -36,7 +47,7 @@ const LecText = styled.div`
   color: black;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
 `;
 
 export default Lecbox;

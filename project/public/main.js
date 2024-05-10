@@ -13,8 +13,7 @@ app.whenReady().then(() => {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
-  mainWindow.loadURL(`http://localhost:3000/`);
-  
+  mainWindow.loadURL('http://localhost:3000');
   ipcMain.on('ping', async (event)=>{
     const sources = await desktopCapturer.getSources({ types: ['window', 'screen'] });
     for (const source of sources) {
@@ -24,18 +23,38 @@ app.whenReady().then(() => {
         event.returnValue = source.id
       }
   }});
+  
   ipcMain.on('remote-coordinates', (event, coordinates) => {
  
-    let { remoteX, remoteY } = coordinates;
-    robot.moveMouse(remoteX, remoteY);
-    robot.mouseClick();
-
+    let { remoteX, remoteY, eventType } = coordinates;
+    if(eventType === 'mousedown')
+    {
+      console.log('isMousedown?')
+      robot.moveMouse(remoteX,remoteY);
+      robot.mouseToggle("down");
+      
+    }
+    else if(eventType === 'mouseup'){
+      console.log("isMouseUp?")
+      robot.dragMouse(remoteX, remoteY);
+      robot.mouseToggle("up");
+    }
+    
   });
-  ipcMain.on('remote-keyPress', (event, asciiKeyCode) => {
-    const pressedKey = String.fromCharCode(parseInt(asciiKeyCode)); // 아스키 코드를 문자열로 변환
-    console.log('Pressed key:', pressedKey);
-    robot.typeString(pressedKey);
-    // 여기서 pressedKey 변수를 원하는 대로 처리할 수 있습니다.
+  ipcMain.on('remote-keyPress', (event, String) => {
+    let pressedKey = String.toLowerCase();
+    let askiiStr = pressedKey.charCodeAt(0);
+    if(pressedKey!=='meta'){if(askiiStr<12593||askiiStr> 12643 ){
+      robot.keyToggle(pressedKey, 'down'); // 키를 누른 상태로 변경
+
+      setTimeout(() => {
+          robot.keyToggle(pressedKey, 'up'); // 0.5초 후에 키를 뗀 상태로 변경
+      }, 500);
+    }
+    else return; 
+    }
+    else return;
+    // 여기서 pressedKey 변수를 원하는 대로 처리할 수 있습니다
   });
 // const text = "원격 테스트"
 //   setTimeout(() => {
