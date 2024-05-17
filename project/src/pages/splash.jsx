@@ -9,27 +9,37 @@ export default function Splash() {
   const navigate = useNavigate()
   const [showSplashscreen, setShowSplashscreen] = useState(false);
   const [loginShow, setLoginShow] = useState(true);
-  const token = localStorage.getItem('token');
+  
   useEffect(() => {
     setTimeout(() => {
       setShowSplashscreen(true);
     }, 3000);
   }, []);
+  
   useEffect(() => {
-    if (token) {
-      navigate('/');
-    }
-  }, [token, navigate]);
-  useEffect(() => { // 로그인했을때 auth 접근제한 + 로그인 후 리다이렉팅
-    const interval = setInterval(() => {
-      const newToken = localStorage.getItem('token');
-      if (newToken) {
-        navigate('/');
+    const checkTokenValidity = async () => {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const Info = JSON.parse(atob(token.split('.')[1]));
+          const milliseconds = Info.exp * 1000;
+          const date = new Date(milliseconds);
+          const currentTime = new Date();
+  
+          if (date > currentTime) {
+            navigate('/');
+          }
+        } catch {
+          navigate('/auth');
+        }
       }
-    }, 1000);
-
+    };
+  
+    const interval = setInterval(checkTokenValidity, 1000);
+  
     return () => clearInterval(interval);
   }, [navigate]);
+  
   const changeShow = () =>{
     setLoginShow(!loginShow)
   }

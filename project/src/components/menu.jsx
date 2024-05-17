@@ -1,15 +1,22 @@
 import React from 'react';
-import styles, { css } from 'styled-components';
+import { useNavigate } from 'react-router-dom';
+import styled, { css } from 'styled-components';
 
 export default function Menu({ isclose }) {
-  
+  const close = isclose === 'false' || isclose === false;
+  const navigate = useNavigate();
+  const logout = ()=>{
+    localStorage.removeItem('token');
+    localStorage.removeItem('rtk');
+    navigate('/auth');
+  }
   return (
-    <Container isclose={!isclose}>
+    <Container isclose={close}>
         <H1>메 뉴</H1>
       
       <Category>
-        <h3>awef</h3>
-        <h3>awef</h3>
+        <h3 onClick={logout}>로그아웃</h3>
+        <h3 onClick={()=>navigate('/home/info')}>회원정보 수정</h3>
         <h3>awef</h3>
         <h3>awef</h3>
       </Category>
@@ -17,7 +24,7 @@ export default function Menu({ isclose }) {
   );
 }
 
-const Container = styles.div`
+const Container = styled.div`
   position: fixed;
   top: 0;
   left:0;
@@ -36,13 +43,16 @@ const Container = styles.div`
     css`
       display: none;
     `}
+    h3{
+      cursor: pointer;
+    }
 `;
-const Category = styles.div`
+const Category = styled.div`
   width:100%;
   height:80vh;
   display: flex;
   flex-direction:column;
 `
-const H1 = styles.h1`
+const H1 = styled.h1`
 padding:20px;
 `

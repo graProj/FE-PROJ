@@ -1,18 +1,27 @@
 import React from 'react';
 import styled from 'styled-components';
+
 import Lecture from '../components/lecture/lecture';
 
+import RequestBox from '../components/lecture/requestBox';
+import {UserData} from '../api/user';
 export default function Home() {
-  console.log("메인 렌더링")
+  const { data, isLoading, error } = UserData();
 
   return (
     <Container>
       <Category>
         <Title>강의 신청내역</Title>
+        <RequestBox/>
       </Category>
       <Lecture/>
 
-      <MyInfo><Title>학생</Title><a href="./room">방입장</a></MyInfo>
+      <MyInfo>
+        <Title>
+          {`${data?.name}님 반갑습니다.`}
+        </Title>
+        <a href="./room">방입장</a>
+      </MyInfo>
     </Container>
   );
 }
@@ -40,7 +49,7 @@ const Title = styled.div`
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:28px;
+  font-size:24px;
   border-bottom:1px solid #c4ae9bbb;
 `;
 
