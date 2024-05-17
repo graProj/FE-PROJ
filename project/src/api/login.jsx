@@ -1,9 +1,6 @@
-// signIn.js
-
-
-const signIn = async (formData, setLoading) => { // 로딩 상태를 매개변수로 전달받음
+const signIn = async (formData, setLoading) => {
   try {
-    setLoading(true); // 로딩 시작
+    setLoading(true);
 
     const response = await fetch('http://3.39.22.211/api/v1/auth/signin', {
       method: 'POST',
@@ -12,23 +9,55 @@ const signIn = async (formData, setLoading) => { // 로딩 상태를 매개변�
       },
       body: JSON.stringify(formData),
     });
+    console.log(response)
 
-    if (!response.ok) {
-      alert("로그인 실패")
-    } 
     const data = await response.json();
-    console.log(data)
-    if(data.response.accessToken){
-      localStorage.setItem('token', data
-      .response.accessToken);
+    if (data.response.accessToken) {
+      localStorage.setItem('token', data.response.accessToken);
+      localStorage.setItem('rtk', data.response.refreshToken);
     }
+
     return data;
-    
+
   } catch (error) {
-    throw error;
+    console.log(error)
+    if(error.response.errorcode==='ERR_05'){
+      alert("비밀번호가 일치하지 않습니다");
+    }
+    else if(error.response.errorcode==='ERR_04'){
+      alert("해당 이메일을 찾을 수 없습니다.");
+    }
   } finally {
-    setLoading(false);// 로딩 종료
+    setLoading(false);
   }
 };
 
-export default signIn;
+const refreshTokenIfNeeded = async () => {
+  const rtk = localStorage.getItem('rtk');
+
+  try {
+    const response = await fetch('http://3.39.22.211/api/v1/auth/refresh', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${rtk}`
+      },
+    });
+
+    const data = await response.json();
+
+    if (response.status===200) {
+      localStorage.setItem('token', data.response.accessToken);
+    }
+    
+
+  } catch (error) {
+    if (error.response.status===403) {
+      alert("세션이 만료되었습니다.");
+      localStorage.removeItem('token');
+    }
+    throw error;
+  }
+};
+
+export { signIn, refreshTokenIfNeeded };

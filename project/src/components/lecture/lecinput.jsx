@@ -4,7 +4,7 @@ import useDebounce from '../../hooks/Debounce';
 
 export default function LecInput ({onSearch}){
     const [searchTerm, setSearchTerm] = useState('');
-    const debouncedSearchText = useDebounce(searchTerm, 300);
+    const debouncedSearchText = useDebounce(searchTerm, 600);
     useEffect(() => {
         onSearch(debouncedSearchText);
       }, [debouncedSearchText]);

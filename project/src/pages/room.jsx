@@ -1,7 +1,7 @@
 import React, { useEffect} from "react";
 import { io } from "socket.io-client";
 
-export default function Room() {
+export default function Room(param) {
   const socket = io("http://3.39.22.211:5004/");
   const room = "didacto3";
   const configuration = {
