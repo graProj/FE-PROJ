@@ -111,7 +111,6 @@ const FR = styled.form`
 const Input = styled.input`
   background-color: transparent;
   border-radius: 10px;
-  border: 1px solid white;
   width: 50%;
   height: 30px;
   color: white;

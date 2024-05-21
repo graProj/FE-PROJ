@@ -1,294 +1,214 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import styled from 'styled-components';
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 import { io } from "socket.io-client";
-import Student from '../components/lecture/student';
-import Chat from '../components/lecture/chat';
-const VideoContainer = styled.video`
-	width: 240px;
-	height: 240px;
-	background-color: black;
-`;
+import styled from "styled-components";
 
-const UserLabel = styled.p`
-	display: inline-block;
-	position: absolute;
-	top: 230px;
-	left: 0px;
-`;
-const Video = ({ email, stream, muted } ) => {
-	const ref = useRef<HTMLVideoElement>(null);
-	const [isMuted, setIsMuted] = useState(false);
-
-	useEffect(() => {
-		if (ref.current) ref.current.srcObject = stream;
-		if (muted) setIsMuted(muted);
-	}, [stream, muted]);
-
-	return (
-		<div>
-			<VideoContainer ref={ref} muted={isMuted} autoPlay />
-			<UserLabel>{email}</UserLabel>
-		</div>
-	);
-};
-const LectureRoom = () => {
-  
-  const [isChatOpen, setIsChatOpen] = useState(false);
-  const [students, setStudents] = useState([]);
-  const pc_config = {
-    iceServers: [
-        // {
-        //   urls: 'stun:[STUN_IP]:[PORT]',
-        //   'credentials': '[YOR CREDENTIALS]',
-        //   'username': '[USERNAME]'
-        // },
+function LectureRoom() {
+    const socket = io("http://3.39.22.211:5004/");
+    const {roomid} = useParams()
+    const room = `${roomid}`;
+    const configuration = {
+        iceServers: [
         {
-            urls: 'stun:stun.l.google.com:19302',
+            urls: "stun:stun.l.google.com:19302",
         },
-    ],
-};
-  const SOCKET_SERVER_URL = 'http://localhost:8080';
-  const socketRef = useRef();
-  const pcsRef = useRef({});
-  const localVideoRef = useRef(null);
-  const localStreamRef = useRef();
-  const [users, setUsers] = useState([]);
+        ],
+    };
+    const [input, setInput] = useState('');
+    const myPeerConnection = new RTCPeerConnection(configuration);
+    async function Send(message) {
+        const data = {
+        roomId: room,
+        ...message,
+        };
+        socket.emit("rtc-message", JSON.stringify(data));
+    }
+    const [isChatOpen, setIsChatOpen] = useState(false);
+    const toggleChat = () => {
+        setIsChatOpen(!isChatOpen);
+    };
 
-  const getLocalStream = useCallback(async () => {
-      try {
-          const localStream = await navigator.mediaDevices.getUserMedia({
-              audio: true,
-              video: {
-                  width: 240,
-                  height: 240,
-              },
-          });
-          localStreamRef.current = localStream;
-          if (localVideoRef.current) localVideoRef.current.srcObject = localStream;
-          if (!socketRef.current) return;
-          socketRef.current.emit('join_room', {
-              room: '1234',
-              email: 'sample@naver.com',
-          });
-      } catch (e) {
-          console.log(`getUserMedia error: ${e}`);
-      }
-  }, []);
+    
+    var stream;
 
-  const createPeerConnection = useCallback((socketID, email) => {
-      try {
-          const pc = new RTCPeerConnection(pc_config);
+    myPeerConnection.onicecandidate = function (event) {
+        console.log("Send Candidate");
+        console.log(event.candidate);
+        Send({
+        event: "candidate",
+        data: event.candidate,
+        });
+        
+    };
+    
 
-          pc.onicecandidate = (e) => {
-              if (!(socketRef.current && e.candidate)) return;
-              console.log('onicecandidate');
-              socketRef.current.emit('candidate', {
-                  candidate: e.candidate,
-                  candidateSendID: socketRef.current.id,
-                  candidateReceiveID: socketID,
-              });
-          };
-
-          pc.oniceconnectionstatechange = (e) => {
-              console.log(e);
-          };
-
-          pc.ontrack = (e) => {
-              console.log('ontrack success');
-              setUsers((oldUsers) =>
-                  oldUsers
-                      .filter((user) => user.id !== socketID)
-                      .concat({
-                          id: socketID,
-                          email,
-                          stream: e.streams[0],
-                      }),
-              );
-          };
-
-          if (localStreamRef.current) {
-              console.log('localstream add');
-              localStreamRef.current.getTracks().forEach((track) => {
-                  if (!localStreamRef.current) return;
-                  pc.addTrack(track, localStreamRef.current);
-              });
-          } else {
-              console.log('no local stream');
-          }
-
-          return pc;
-      } catch (e) {
-          console.error(e);
-          return undefined;
-      }
-  }, []);
-
-  useEffect(() => {
-      socketRef.current = io.connect(SOCKET_SERVER_URL);
-      getLocalStream();
-
-      socketRef.current.on('all_users', (allUsers) => {
-          allUsers.forEach(async (user) => {
-              if (!localStreamRef.current) return;
-              const pc = createPeerConnection(user.id, user.email);
-              if (!(pc && socketRef.current)) return;
-              pcsRef.current = { ...pcsRef.current, [user.id]: pc };
-              try {
-                  const localSdp = await pc.createOffer({
-                      offerToReceiveAudio: true,
-                      offerToReceiveVideo: true,
-                  });
-                  console.log('create offer success');
-                  await pc.setLocalDescription(new RTCSessionDescription(localSdp));
-                  socketRef.current.emit('offer', {
-                      sdp: localSdp,
-                      offerSendID: socketRef.current.id,
-                      offerSendEmail: 'offerSendSample@sample.com',
-                      offerReceiveID: user.id,
-                  });
-              } catch (e) {
-                  console.error(e);
-              }
-          });
-      });
-
-      socketRef.current.on(
-          'getOffer',
-          async (data) => {
-              const { sdp, offerSendID, offerSendEmail } = data;
-              console.log('get offer');
-              if (!localStreamRef.current) return;
-              const pc = createPeerConnection(offerSendID, offerSendEmail);
-              if (!(pc && socketRef.current)) return;
-              pcsRef.current = { ...pcsRef.current, [offerSendID]: pc };
-              try {
-                  await pc.setRemoteDescription(new RTCSessionDescription(sdp));
-                  console.log('answer set remote description success');
-                  const localSdp = await pc.createAnswer({
-                      offerToReceiveVideo: true,
-                      offerToReceiveAudio: true,
-                  });
-                  await pc.setLocalDescription(new RTCSessionDescription(localSdp));
-                  socketRef.current.emit('answer', {
-                      sdp: localSdp,
-                      answerSendID: socketRef.current.id,
-                      answerReceiveID: offerSendID,
-                  });
-              } catch (e) {
-                  console.error(e);
-              }
-          },
-      );
-
-      socketRef.current.on(
-          'getAnswer',
-          (data) => {
-              const { sdp, answerSendID } = data;
-              console.log('get answer');
-              const pc = pcsRef.current[answerSendID];
-              if (!pc) return;
-              pc.setRemoteDescription(new RTCSessionDescription(sdp));
-          },
-      );
-
-      socketRef.current.on(
-          'getCandidate',
-          async (data) => {
-              console.log('get candidate');
-              const pc = pcsRef.current[data.candidateSendID];
-              if (!pc) return;
-              await pc.addIceCandidate(new RTCIceCandidate(data.candidate));
-              console.log('candidate add success');
-          },
-      );
-
-      socketRef.current.on('user_exit', (data) => {
-          if (!pcsRef.current[data.id]) return;
-          pcsRef.current[data.id].close();
-          delete pcsRef.current[data.id];
-          setUsers((oldUsers) => oldUsers.filter((user) => user.id !== data.id));
-      });
-
-      return () => {
-          if (socketRef.current) {
-              socketRef.current.disconnect();
-          }
-          users.forEach((user) => {
-              if (!pcsRef.current[user.id]) return;
-              pcsRef.current[user.id].close();
-              delete pcsRef.current[user.id];
-          });
+    const Send2 = async (message) => {
+        const data = { roomId: room, ...message };
+        socket.emit("remote-event", JSON.stringify(data));
       };
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [createPeerConnection, getLocalStream]);
+    
+      const sendClientXCoordinate = (xCoordinate) => {
+        Send2({ event: "chatting", data: xCoordinate });
+      };
+      var stream;
+    const SendMessage = (e) => {
+        // 마우스 업 시점의 좌표를 전송
+        sendClientXCoordinate({e});
+        setInput('')
+      };
+    const getMedia = async () => {
+        try {
+        console.log("first");
+        socket.emit("join-master", room);
 
-  const toggleChat = () => {
-    setIsChatOpen(!isChatOpen);
-  };
-  
-  return (
-    <Container>
-      <ProfessorContainer>
-        <h2>교수 화면</h2>
-        <ProfessorVideo muted
-          ref={localVideoRef}
-          autoPlay width="100%" height="100%"></ProfessorVideo>
-      </ProfessorContainer>
-      <GridContainer>
-        <h2>학생 화면</h2>
-        {users.map((user, index) => (
-                <Video key={index} email={user.email} stream={user.stream} />
-            ))}
-      </GridContainer>
-      <ChatContainer>
-        <ChatButton onClick={toggleChat}>{isChatOpen ? "채팅 비활성화":"채팅 활성화"}</ChatButton>
-        <ChatBox isopen={isChatOpen}>
-          <Chat/>
-        </ChatBox>
-      </ChatContainer>
-    </Container>
-  );
-};
+        socket.on("room-full", async (message) => {
+            alert("입장 인원 초과");
+            window.location.reload(true);
+        });
 
-export default LectureRoom;
+        socket.on("rtc-message", async (message) => {
+            var content = JSON.parse(message);
+            console.log("메시지");
 
-const Container = styled.div`
-  display: flex;
-`;
+            if (content.event === "offer") {
+                console.log("Receive Offer", content.data);
+                var offer = content.data;
+                await myPeerConnection.setRemoteDescription(offer);
+                stream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: true,
+                });
+                const myFace = document.getElementById("myFace");
+                myFace.srcObject = stream;
+                stream
+                    .getTracks()
+                    .forEach((track) => myPeerConnection.addTrack(track, stream));
+                var answer = await myPeerConnection.createAnswer();
+                console.log("Send Answer");
+                await myPeerConnection.setLocalDescription(answer);
+                Send({
+                    event: "answer",
+                    data: answer,
+                });
+            } 
+            else if (content.event === "answer") {
+                console.log("Receive Answer");
+                var answer = content.data;
+                await myPeerConnection.setRemoteDescription(answer);
+            } 
+            else if (content.event === "candidate") {
+                console.log("Receive Candidate");
+                await myPeerConnection.addIceCandidate(content.data);
+            }
+            else if (content.event === "chat-message") {
+                console.log("chat-message");
+                await myPeerConnection.addIceCandidate(content.data);
+            }
+        });
+        socket.on("remote-event", async (message) => {
+            var content = JSON.parse(message);
+        
+        if (content.event === "chatting") {
+            console.log(content.data)
+            const chatBox = document.getElementById("chatBox");
+            const messageNode = document.createElement("div");
+            messageNode.textContent = content.data.e;
+            chatBox.appendChild(messageNode);
+        }   
+        });
 
-const ProfessorContainer = styled.div`
-  flex: 1;
-  padding: 20px;
-  border: 1px solid black;
-`;
+        } catch (error) {
+        console.error("Error accessing media devices:", error);
+        }
+    };
 
-const GridContainer = styled.div`
-  flex: 3;
-  padding: 20px;
-`;
+    useEffect(() => {
+        getMedia();
+    }, []);
 
-const ChatContainer = styled.div`
-  flex: 1;
-  padding: 20px;
-`;
+    myPeerConnection.addEventListener("addstream", handleAddStream);
 
-const ProfessorVideo = styled.video`
-  width: 100%;
-  height: 100%;
-  border-radius: 5px;
-  overflow: hidden;
-  border-radius: 1px solid black;
-`;
+    function handleAddStream(data) {
+        console.log("Receive Streaming Data!");
+        var peerVideo = document.getElementById("peerVideo");
+        peerVideo.srcObject = data.stream;
+    }
+    
+        return (
+            <Container>
+                <ProfessorContainer>
+                    <h2>교수 화면</h2>
+                    <video id="peerVideo" playsInline autoPlay width="300" height="300"/>
+                </ProfessorContainer>
+                <GridContainer>
+                    <h2>학생 화면</h2>
+                    <video id="myFace" playsInline autoPlay width="40%" height="30%" />
+                    
+                </GridContainer>
+                <ChatContainer>
+                    <ChatButton onClick={toggleChat}>{isChatOpen ? "채팅 비활성화" : "채팅 활성화"}</ChatButton>
+                    <ChatBox isopen={isChatOpen}>
+                        <ChatInput
+                        type="text"
+                        value={input}
+                        onChange={(e) => setInput(e.target.value)}
+                        placeholder="메시지 입력..."
+                        />
+                        <SendButton onClick={()=>SendMessage(input)}>전송</SendButton>
+                        <div id="chatBox"></div>
+                    </ChatBox>
+                </ChatContainer>
+            </Container>
+        );
+    };
+    export default LectureRoom;
 
-const ChatButton = styled.button`
-  color: black;
-  border: black;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-`;
+    const Container = styled.div`
+        display: flex;
+    `;
 
-const ChatBox = styled.div`
-  display: ${({ isopen }) => (isopen ? 'block' : 'none')};
-  border: 1px solid black;
-`;
+    const ProfessorContainer = styled.div`
+        flex: 1;
+        padding: 20px;
+        border: 1px solid black;
+    `;
+
+    const GridContainer = styled.div`
+        flex: 3;
+        padding: 20px;
+    `;
+
+    const ChatContainer = styled.div`
+        flex: 1;
+        padding: 20px;
+    `;
+
+    const ChatButton = styled.button`
+        color: black;
+        border: black;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    `;
+
+    const ChatBox = styled.div`
+        display: ${({ isopen }) => (isopen ? 'block' : 'none')};
+        border: 1px solid black;
+    `;
+    const ChatInput = styled.input`
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-right: 10px;
+    `;
+    const SendButton = styled.button`
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    `;
+
+
