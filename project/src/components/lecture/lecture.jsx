@@ -90,8 +90,7 @@ const Title = styled.div`
 `;
 
 const LectureList = styled.div`
-  width: 100%;
-  height: 100%;
+  height: calc(100vh - 225px);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -99,7 +98,7 @@ const LectureList = styled.div`
   scrollbar-width: none;
   -ms-overflow-style: none; 
   &::-webkit-scrollbar {
-    width: 0;
+    display: none;
   }
   border-right: 1px solid black;
   padding-left: 15px;

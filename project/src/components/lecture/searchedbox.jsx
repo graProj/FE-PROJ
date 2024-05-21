@@ -18,7 +18,7 @@ function M_Lecbox({ onEnroll , text, boxId, name}) {
 
 const Container = styled.div`
   width: 95%;
-  height: 50px;
+  height: 100%;
   border: 1px solid black;
   margin: 2px;
   border-radius: 10px;

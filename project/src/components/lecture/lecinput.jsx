@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import styles from 'styled-components';
+import styled from 'styled-components';
 import useDebounce from '../../hooks/Debounce';
 
 export default function LecInput ({onSearch}){
@@ -21,17 +21,18 @@ export default function LecInput ({onSearch}){
     );
 }
 
-const TopContainer = styles.div`
+const TopContainer = styled.div`
   display:flex;
   justify-content:space-around;
   align-items:center;
+  height:70px;
   `;
-const InputContainer = styles.div`
+const InputContainer = styled.div`
   width:40%;
   display:flex;
   height:40px;
 `;
-const StyledInput = styles.input`
+const StyledInput = styled.input`
   width:100%;
   border: 1px solid #0ea8f09b;
   border-radius:10px;

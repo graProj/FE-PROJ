@@ -29,7 +29,6 @@ export default function Home() {
 const Container = styled.div`
   width:100vw;
   z-index:100;
-  height: calc(100vh - 55px);
   display:flex;
 `;
 
@@ -59,7 +58,7 @@ const MyInfo = styled.div`
   display:flex;
   flex-direction:column;
   width: 25%;
-  height:100%;
+  height:calc(100vh - 55px);
   border-left:1px solid #c4ae9bbb;
 `;
 

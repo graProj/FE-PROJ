@@ -42,11 +42,16 @@ export default function RequestBox() {
 
 const Container = styled.div`
     width: 100%;
+    min-height: calc(100vh - 115px);
+    overflow: scroll;
+    ::-webkit-scrollbar{
+      display: none;
+    }
 `;
 
 const LectureItem = styled.div`
     width: 100%;
-    height: 100px;
+    min-height: 20%;
     border-bottom: 1px solid gray;
     display: flex;
     flex-direction: column;

@@ -7,9 +7,14 @@ function Lecbox({ onDelete , text, boxId, name}) {
   const handleDelete = () => {
     onDelete();
   };
-  const goRoom = ()=>{
-    window.location.href = `/home/${boxId}`
+  const goRoom = async()=>{
+    const isJoin= window.confirm(`${text} 참여하시겠습니까?`);
+    if(isJoin){
+      window.location.href = `/home/${boxId}`
+    }
+    
   }
+  
   return (
     <Container >
       <Btn onClick={goRoom}><LecText><h2>{text}</h2><p>강의자 :{name}</p></LecText></Btn>
