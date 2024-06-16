@@ -7,6 +7,7 @@ import Splash from './pages/splash';
 import PrivateRoutes from './layout/layout';
 import LectureRoom from './pages/lectureRoom';
 import ModifyUser from './pages/modifyUser';
+import MediaTest from './pages/mediaTest';
 const router = createBrowserRouter([
   {
     path: '/',
@@ -17,7 +18,7 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: 'room',
+        path: '/home/room/:id',
         element: <Room />
       },
       {
@@ -27,6 +28,10 @@ const router = createBrowserRouter([
       {
         path: '/home/info', 
         element: <ModifyUser />
+      },
+      {
+        path: '/home/testroom', 
+        element: <MediaTest />
       },
     ],
   },

@@ -1,6 +1,6 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import styled, { createGlobalStyle } from 'styled-components'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 import Menu from './menu'
 import MenuIcon from '@mui/icons-material/Menu';
@@ -9,10 +9,11 @@ import { Button, Switch } from '@mui/material';
 export default function Header() {
   const [isClickMenu, setIsClickMenu] = useState(false);
   const [isDarkMode, setIsDarkMode] = useState(true);
-  const Navigate = useNavigate();
-  
+  const navigate = useNavigate();
+  const location = useLocation();
+
   const goHome = () => {
-    Navigate('/');
+    navigate('/');
   };
 
   const MenuHandler = () => {
@@ -22,6 +23,11 @@ export default function Header() {
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
   };
+
+  useEffect(() => {
+    // Close the menu whenever the location changes
+    setIsClickMenu(false);
+  }, [location]);
 
   return (
     <>
@@ -38,6 +44,7 @@ export default function Header() {
     </>
   );
 }
+
 const Container = styled.div`
   height: 50px;
   display:flex;
@@ -50,7 +57,6 @@ const Container = styled.div`
 `
 const Logo= styled.div`
   width: 20%;
-  
   cursor: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg'  width='40' height='48' viewport='0 0 100 100' style='fill:black;font-size:24px;'><text y='50%'>🏠</text></svg>") 16 0, auto;
 `
 const Cates = styled.div`
@@ -64,7 +70,6 @@ const Btn = styled(Button)`
   background-color: transparent;
   border: none;
 `
-
 
 const GlobalStyle = createGlobalStyle`
   body {
