@@ -1,10 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect} from "react";
+import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
-import { useNavigate } from 'react-router-dom';
 
 export default function Room() {
-  const navigate = useNavigate()
   const socket = io("http://3.39.22.211:5004/");
+  const navigate = useNavigate();
   const room = "didacto3";
   const configuration = {
     iceServers: [
@@ -13,16 +13,13 @@ export default function Room() {
       },
     ],
   };
-  let myPeerConnection = null;
+  const myPeerConnection = new RTCPeerConnection(configuration);
   let offer = null;
   let answer = null;
-  let screenStream = null;
-  let cameraStream = null;
+  let stream = null;
   let source = null;
-
   useEffect(() => {
-    initializePeerConnection();
-
+    getMedia();
     return () => {
       if (myPeerConnection) {
         myPeerConnection.close();
@@ -30,31 +27,7 @@ export default function Room() {
       }
     };
   }, []);
-
-  function initializePeerConnection() {
-    myPeerConnection = new RTCPeerConnection(configuration);
-
-    myPeerConnection.onicecandidate = function (event) {
-      console.log("Send Candidate");
-      console.log(event.candidate);
-      Send({
-        event: "candidate",
-        data: event.candidate,
-      });
-    };
-
-    myPeerConnection.addEventListener("addstream", handleAddStream);
-
-    window.addEventListener("beforeunload", function () {
-      if (myPeerConnection && myPeerConnection.connectionState !== 'closed') {
-        myPeerConnection.close();
-        console.log("연결끊음")
-      }
-    });
-
-    createOffer();
-  }
-
+  myPeerConnection.addEventListener("addstream", handleAddStream);
   function handleAddStream(data) {
     console.log("Receive Streaming Data!");
     var peerVideo = document.getElementById("peerVideo");
@@ -87,9 +60,29 @@ export default function Room() {
           console.log("Receive Offer", content.data);
           offer = content.data;
           await myPeerConnection.setRemoteDescription(offer);
-          await getMedia();
-          screenStream.getTracks().forEach((track) => myPeerConnection.addTrack(track, screenStream));
-          cameraStream.getTracks().forEach((track) => myPeerConnection.addTrack(track, cameraStream));
+          if (!source) {
+            source = await window.display.source();
+          }
+    
+          stream = await navigator.mediaDevices.getUserMedia({
+            audio: false,
+            video: {
+              mandatory: {
+                chromeMediaSource: "desktop",
+                chromeMediaSourceId: source,
+                minWidth: 1280,
+                maxWidth: 1280,
+                minHeight: 720,
+                maxHeight: 720,
+              },
+            },
+          });
+    
+          const myFace = document.getElementById("myFace");
+          myFace.srcObject = stream;
+          stream
+            .getTracks()
+            .forEach((track) => myPeerConnection.addTrack(track, stream));
           answer = await myPeerConnection.createAnswer();
           await myPeerConnection.setLocalDescription(answer);
           console.log("Send Answer");
@@ -102,7 +95,6 @@ export default function Room() {
           answer = content.data;
           await myPeerConnection.setRemoteDescription(answer);
         } else if (content.event === "candidate") {
-          console.log("Receive Candidate");
           await myPeerConnection.addIceCandidate(content.data);
         } else if (content.event === "client_x_coordinate") {
           var xCoordinate = content.data;
@@ -136,65 +128,19 @@ export default function Room() {
       socket.on('connect_error', function() {
         navigate(-1);
       });
-      console.log(await window.display.source());
-      if (!source) {
-        source = await window.display.source();
-      }
-
-      // 화면 공유 캡처
-      screenStream = await navigator.mediaDevices.getUserMedia({
-        audio: false,
-        video: {
-          mandatory: {
-            chromeMediaSource: "desktop",
-            chromeMediaSourceId: source,
-            minWidth: 1280,
-            maxWidth: 1280,
-            minHeight: 720,
-            maxHeight: 720,
-          },
-        },
-      });
-
-      // 카메라 캡처
-      cameraStream = await navigator.mediaDevices.getUserMedia({
-        audio: true,
-        video: true,
-      });
-
-      const screenVideo = document.getElementById("screenVideo");
-      screenVideo.srcObject = screenStream;
-
-      const cameraVideo = document.getElementById("cameraVideo");
-      cameraVideo.srcObject = cameraStream;
     } catch (error) {
       console.error("Error accessing media devices:", error);
     }
   }
 
-  async function createOffer() {
-    await getMedia();
-    cameraStream.getTracks().forEach((track) => myPeerConnection.addTrack(track, cameraStream));
-    screenStream.getTracks().forEach((track) => myPeerConnection.addTrack(track, screenStream));
-    offer = await myPeerConnection.createOffer();
-    await Send({
-      event: "offer",
-      data: offer,
-    });
-    console.log("Send Offer: ", offer);
-    await myPeerConnection.setLocalDescription(offer);
-  }
 
   return (
     <div id="box">
       <div id="result"></div>
       <input type="text" />
-      <div style={{ position: "relative" }}>
-        <video id="screenVideo" playsInline autoPlay width="700" ></video>
-        <video id="cameraVideo" playsInline autoPlay width="150" height="150" style={{ position: "absolute", top: "10px", right: "10px" }}></video>
-      </div>
+      <video id="myFace" playsInline autoPlay width="600" height="600"></video>
       <a href="/">Home</a>
-      <video id="peerVideo" playsInline autoPlay width="40%" height="30%"  style={{ zIndex: 99}}></video>
+      <video id="peerVideo" playsInline autoPlay width="40%" height="30%"></video>
     </div>
   );
 }
