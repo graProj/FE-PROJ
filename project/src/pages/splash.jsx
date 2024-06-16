@@ -125,7 +125,6 @@ const MainText = styles.div`
   font-weight: 700;
   color: white;
   text-align: center;
-  z-index: 100;
   animation: ${fadeIn} 0s ease-in-out 1.8s forwards;
   display:flex;
   flex-direction:column;

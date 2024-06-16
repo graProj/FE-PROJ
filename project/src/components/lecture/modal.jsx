@@ -40,7 +40,7 @@ function LectureModal({ onClose }) {
           <MainContext>
             <LecInput onSearch={handleSearch} />
             <button onClick={onSearchHandler}>강의 검색하기</button>
-            <div>
+            <div style={{overflowY:'scroll', height:'70%'}}>
               {!isLoading && !error && (
                 <LectureList>
                   {data.map((box,index) => (
@@ -75,6 +75,7 @@ const ModalOverlay = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 99;
 `;
 
 const ModalContent = styled.div`
@@ -82,6 +83,7 @@ const ModalContent = styled.div`
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
 `;
 
 const CloseButton = styled.button`
@@ -107,16 +109,10 @@ const MainContext = styled.div`
 `;
 const LectureList = styled.div`
   width: 100%;
-  height: 100%;
+  height: 100VH;
   display: flex;
   flex-direction: column;
   align-items: center;
-  overflow-y: scroll;
-  scrollbar-width: none;
-  -ms-overflow-style: none; 
-  &::-webkit-scrollbar {
-    width: 0;
-  }
   border-right: 1px solid black;
   padding-left: 15px;
   padding-right: 15px;

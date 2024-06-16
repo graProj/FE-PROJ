@@ -17,7 +17,7 @@ export default function Menu({ isclose }) {
       <Category>
         <h3 onClick={logout}>로그아웃</h3>
         <h3 onClick={()=>navigate('/home/info')}>회원정보 수정</h3>
-        <h3>awef</h3>
+        <h3 onClick={()=>navigate('/home/testroom')}>카메라 테스트</h3>
         <h3>awef</h3>
       </Category>
     </Container>

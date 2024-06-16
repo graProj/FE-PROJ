@@ -1,7 +1,9 @@
-import React, { useEffect} from "react";
+import React, { useEffect } from "react";
 import { io } from "socket.io-client";
+import { useNavigate } from 'react-router-dom';
 
 export default function Room() {
+  const navigate = useNavigate()
   const socket = io("http://3.39.22.211:5004/");
   const room = "didacto3";
   const configuration = {
@@ -14,7 +16,8 @@ export default function Room() {
   let myPeerConnection = null;
   let offer = null;
   let answer = null;
-  let stream = null;
+  let screenStream = null;
+  let cameraStream = null;
   let source = null;
 
   useEffect(() => {
@@ -85,7 +88,8 @@ export default function Room() {
           offer = content.data;
           await myPeerConnection.setRemoteDescription(offer);
           await getMedia();
-          stream.getTracks().forEach((track) => myPeerConnection.addTrack(track, stream));
+          screenStream.getTracks().forEach((track) => myPeerConnection.addTrack(track, screenStream));
+          cameraStream.getTracks().forEach((track) => myPeerConnection.addTrack(track, cameraStream));
           answer = await myPeerConnection.createAnswer();
           await myPeerConnection.setLocalDescription(answer);
           console.log("Send Answer");
@@ -121,12 +125,24 @@ export default function Room() {
           
         }
       });
+      socket.on('kick', async (data) => {
+        navigate(-1);
+      })
+      socket.on('disconnect', () => {
+        navigate(-1);
+      });
+
+    // 시작부터 연결이 안될 경우
+      socket.on('connect_error', function() {
+        navigate(-1);
+      });
       console.log(await window.display.source());
       if (!source) {
         source = await window.display.source();
       }
 
-      stream = await navigator.mediaDevices.getUserMedia({
+      // 화면 공유 캡처
+      screenStream = await navigator.mediaDevices.getUserMedia({
         audio: false,
         video: {
           mandatory: {
@@ -140,8 +156,17 @@ export default function Room() {
         },
       });
 
-      const myFace = document.getElementById("myFace");
-      myFace.srcObject = stream;
+      // 카메라 캡처
+      cameraStream = await navigator.mediaDevices.getUserMedia({
+        audio: true,
+        video: true,
+      });
+
+      const screenVideo = document.getElementById("screenVideo");
+      screenVideo.srcObject = screenStream;
+
+      const cameraVideo = document.getElementById("cameraVideo");
+      cameraVideo.srcObject = cameraStream;
     } catch (error) {
       console.error("Error accessing media devices:", error);
     }
@@ -149,7 +174,8 @@ export default function Room() {
 
   async function createOffer() {
     await getMedia();
-    stream.getTracks().forEach((track) => myPeerConnection.addTrack(track, stream));
+    cameraStream.getTracks().forEach((track) => myPeerConnection.addTrack(track, cameraStream));
+    screenStream.getTracks().forEach((track) => myPeerConnection.addTrack(track, screenStream));
     offer = await myPeerConnection.createOffer();
     await Send({
       event: "offer",
@@ -163,9 +189,12 @@ export default function Room() {
     <div id="box">
       <div id="result"></div>
       <input type="text" />
-      <video id="myFace" playsInline autoPlay width="600" height="600"></video>
+      <div style={{ position: "relative" }}>
+        <video id="screenVideo" playsInline autoPlay width="700" ></video>
+        <video id="cameraVideo" playsInline autoPlay width="150" height="150" style={{ position: "absolute", top: "10px", right: "10px" }}></video>
+      </div>
       <a href="/">Home</a>
-      <video id="peerVideo" playsInline autoPlay width="40%" height="30%"></video>
+      <video id="peerVideo" playsInline autoPlay width="40%" height="30%"  style={{ zIndex: 99}}></video>
     </div>
   );
 }
