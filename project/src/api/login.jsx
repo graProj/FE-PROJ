@@ -1,8 +1,9 @@
+const BACK_SERVER = process.env.REACT_APP_BACK_SERVER;
 const signIn = async (formData, setLoading) => {
   try {
     setLoading(true);
-
-    const response = await fetch('http://3.39.22.211/api/v1/auth/signin', {
+    
+    const response = await fetch(`${BACK_SERVER}/api/v1/auth/signin`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -36,7 +37,7 @@ const refreshTokenIfNeeded = async () => {
   const rtk = localStorage.getItem('rtk');
 
   try {
-    const response = await fetch('http://3.39.22.211/api/v1/auth/refresh', {
+    const response = await fetch(`${BACK_SERVER}/api/v1/auth/refresh`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

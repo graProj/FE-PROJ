@@ -17,9 +17,8 @@ app.whenReady().then(() => {
   ipcMain.on('ping', async (event)=>{
     const sources = await desktopCapturer.getSources({ types: ['window', 'screen'] });
     for (const source of sources) {
-      console.log(source)
-      if (source.name === '전체 화면') {
-        console.log(source.id)
+      if (source.id === 'screen:0:0') {
+        console.log(source.thumbnail.toJPEG(0.5))
         event.returnValue = source.id
       }
   }});
@@ -56,27 +55,19 @@ app.whenReady().then(() => {
     else return;
     // 여기서 pressedKey 변수를 원하는 대로 처리할 수 있습니다
   });
-// const text = "원격 테스트"
-//   setTimeout(() => {
-//     const screenSize = robot.getScreenSize();
-//     let centerX = screenSize.width / 2;
-//     let centerY = screenSize.height / 2;
-//     robot.moveMouse(centerX, centerY);
-//     centerX = 558 
-//     centerY = 640
-//     robot.scrollMouse(500, 0);
-//     robot.moveMouseSmooth(centerX, centerY);
-//     setTimeout(() => {
-//       robot.mouseClick();
-//       for (let i = 0; i < text.length; i++) {
-//         setTimeout((char) => {
-//             robot.typeString(char);
-//             console.log(char);
-//         }, 200 * i, text[i]);
-//     }
-//   }, 500);
-  
-//   }, 5000);
+  setInterval(async () => {
+    try {
+      const sources = await desktopCapturer.getSources({ types: ['window', 'screen'] });
+      for (const source of sources) {
+        if (source.id === 'screen:0:0') {
+          console.log('Captured screen at', new Date());
+          source.thumbnail.toJPEG(0.5);
+        }
+      }
+    } catch (error) {
+      console.error('Error capturing screen:', error);
+    }
+  }, 10000); // 10000ms = 10초
 
 });
 
