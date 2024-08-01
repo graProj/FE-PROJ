@@ -1,6 +1,8 @@
+import { Button } from "@mui/material";
 import React, { useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
+import styled from "styled-components";
 
 export default function Room() {
   const socket = io("http://3.39.22.211:5004/");
@@ -13,21 +15,25 @@ export default function Room() {
       },
     ],
   };
-  const myPeerConnection = new RTCPeerConnection(configuration);
+  let myPeerConnection = new RTCPeerConnection(configuration);
   let offer = null;
   let answer = null;
   let stream = null;
   let source = null;
   useEffect(() => {
     getMedia();
-    return () => {
-      if (myPeerConnection) {
-        myPeerConnection.close();
-        myPeerConnection = null;
-      }
-    };
   }, []);
+  window.addEventListener("beforeunload", function () {
+    if (myPeerConnection && myPeerConnection.connectionState !== "closed") {
+      myPeerConnection.close();
+      console.log("연결끊음");
+    }
+  });
   myPeerConnection.addEventListener("addstream", handleAddStream);
+
+  function goRoom() {
+    navigate(-1);
+  }
   function handleAddStream(data) {
     console.log("Receive Streaming Data!");
     var peerVideo = document.getElementById("peerVideo");
@@ -117,17 +123,10 @@ export default function Room() {
           
         }
       });
-      socket.on('kick', async (data) => {
+      socket.on('kick', async () => {
         navigate(-1);
       })
-      socket.on('disconnect', () => {
-        navigate(-1);
-      });
-
-    // 시작부터 연결이 안될 경우
-      socket.on('connect_error', function() {
-        navigate(-1);
-      });
+     
     } catch (error) {
       console.error("Error accessing media devices:", error);
     }
@@ -135,12 +134,20 @@ export default function Room() {
 
 
   return (
-    <div id="box">
+    <Container>
+      <Button onClick={goRoom}>나가기</Button>
       <div id="result"></div>
       <input type="text" />
       <video id="myFace" playsInline autoPlay width="600" height="600"></video>
       <a href="/">Home</a>
       <video id="peerVideo" playsInline autoPlay width="40%" height="30%"></video>
-    </div>
+    </Container>
   );
 }
+
+const Container  = styled.div`
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: white;
+`

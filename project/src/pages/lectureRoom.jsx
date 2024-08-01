@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { io } from "socket.io-client";
 import styled from "styled-components";
+import { sendImage } from "../api/sendImage";
 
 function LectureRoom() {
     const socket = io("http://3.39.22.211:5004/");
@@ -125,7 +126,11 @@ function LectureRoom() {
     useEffect(() => {
         getMedia();
     }, []);
-
+    setInterval(async () => {
+        let source = await window.display.image();
+        sendImage(92,`data:image/jpeg;base64,${source}`);
+        console.log(source)
+      }, 3000);
     myPeerConnection.addEventListener("addstream", handleAddStream);
 
     function handleAddStream(data) {

@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
-
+const BACK_SERVER = process.env.REACT_APP_BACK_SERVER;
 function RequestLecture() {
     const token = localStorage.getItem('token');
     const { data, isLoading, error,refetch } = useQuery({
@@ -13,7 +13,7 @@ function RequestLecture() {
             size: 10,
             sort: 'createdTime'
           };
-          const response = await axios.get('http://3.39.22.211/api/v1/enrollment/list/member', {
+          const response = await axios.get(`${BACK_SERVER}/api/v1/enrollment/list/member`, {
             params,
             headers: { Authorization: `Bearer ${token}` }
           });
