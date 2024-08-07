@@ -1,13 +1,17 @@
 import { createBrowserRouter } from 'react-router-dom';
 
+import PrivateRoutes from './layout/layout';
+
 import Room from './pages/room';
 import Notfound from './pages/notfound';
 import Home from './pages/home';
 import Splash from './pages/splash';
-import PrivateRoutes from './layout/layout';
 import LectureRoom from './pages/lectureRoom';
 import ModifyUser from './pages/modifyUser';
 import MediaTest from './pages/mediaTest';
+import Search from './pages/search';
+import LectureInfo from './pages/lectureInfo';
+import RemoteInfo from './pages/remoteInfo';
 const router = createBrowserRouter([
   {
     path: '/',
@@ -16,6 +20,14 @@ const router = createBrowserRouter([
       {
         path: '',
         element: <Home />,
+      },
+      {
+        path: '/home/lectureinfo',
+        element: <LectureInfo />
+      },
+      {
+        path: '/home/remoteinfo',
+        element: <RemoteInfo />
       },
       {
         path: '/home/room/:id',
@@ -32,6 +44,10 @@ const router = createBrowserRouter([
       {
         path: '/home/testroom', 
         element: <MediaTest />
+      },
+      {
+        path: '/home/search', 
+        element: <Search/>
       },
     ],
   },

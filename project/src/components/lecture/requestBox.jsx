@@ -1,10 +1,9 @@
-import styled from '@emotion/styled'
 import React from 'react'
-import CancelIcon from '@mui/icons-material/Cancel';
-
 import useRequestLecture from "../../api/requestLecture"
 import LoadingIndicator from '../../hooks/loading';
 import { CancelData } from '../../api/lectureEnrollment';
+import { EraserIcon } from '@radix-ui/react-icons';
+import { Button } from '@radix-ui/themes/dist/cjs/index.js';
 
 export default function RequestBox() {
   const { data, isLoading, error } = useRequestLecture();
@@ -22,39 +21,18 @@ export default function RequestBox() {
     }
   };
 
-
-
   return (
-    <Container>
+    <div className="w-full min-h-[calc(100vh-115px)] ">
       {/* data 사용 예시 */}
       {isLoading && <LoadingIndicator/>}
       {!isLoading && !error && 
       (data && data.response && data.response.enrollments && data.response.enrollments.map((enrollment, index) => (
-        <LectureItem key={index}>
+        <div key={index} className="w-full min-h-[20%] border-b border-gray-400 flex flex-col justify-center items-center">
           <p>{enrollment.status}</p>
           <p>{enrollment.lecture.title}-{enrollment.lecture.owner.name}</p>
-          <button onClick={()=>onSubmitHandler(enrollment.lecture.title, enrollment.id)}><CancelIcon/></button>
-        </LectureItem>
+          <Button onClick={()=>onSubmitHandler(enrollment.lecture.title, enrollment.id)}><EraserIcon/></Button>
+        </div>
       )))}
-    </Container>
+    </div>
   );
 }
-
-const Container = styled.div`
-    width: 100%;
-    min-height: calc(100vh - 115px);
-    overflow: scroll;
-    ::-webkit-scrollbar{
-      display: none;
-    }
-`;
-
-const LectureItem = styled.div`
-    width: 100%;
-    min-height: 20%;
-    border-bottom: 1px solid gray;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-`;

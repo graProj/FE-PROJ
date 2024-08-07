@@ -1,6 +1,6 @@
 // ProtectedRoutes.js
 
-import { Outlet, Navigate, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useLocation, useNavigate } from "react-router-dom";
 import '../index.css';
 import Header from "../components/header";
 import { useEffect, useState } from "react";

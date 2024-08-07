@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { io } from "socket.io-client";
-import styled from "styled-components";
+
 import { sendImage } from "../api/sendImage";
 
 function LectureRoom() {
@@ -138,82 +138,42 @@ function LectureRoom() {
         var peerVideo = document.getElementById("peerVideo");
         peerVideo.srcObject = data.stream;
     }
+    return (
+        <div className="flex">
+          <div className="flex-1 p-5 border border-black">
+            <h2>교수 화면</h2>
+            <video id="peerVideo" playsInline autoPlay className="w-[300px] h-[300px]" />
+          </div>
+          <div className="flex-3 p-5">
+            <h2>학생 화면</h2>
+            <video id="myFace" playsInline autoPlay className="w-[40%] h-[30%]" />
+          </div>
+          <div className="flex-1 p-5">
+            <button
+              onClick={toggleChat}
+              className="text-black border-black p-2.5 px-5 rounded cursor-pointer"
+            >
+              {isChatOpen ? "채팅 비활성화" : "채팅 활성화"}
+            </button>
+            <div className={`${isChatOpen ? 'block' : 'hidden'} border border-black`}>
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="메시지 입력..."
+                className="flex-1 p-2.5 border border-gray-300 rounded mr-2.5"
+              />
+              <button
+                onClick={() => SendMessage(input)}
+                className="p-2.5 px-5 bg-blue-500 text-white border-none rounded cursor-pointer"
+              >
+                전송
+              </button>
+              <div id="chatBox"></div>
+            </div>
+          </div>
+        </div>
+      );
+    }
     
-        return (
-            <Container>
-                <ProfessorContainer>
-                    <h2>교수 화면</h2>
-                    <video id="peerVideo" playsInline autoPlay width="300" height="300"/>
-                </ProfessorContainer>
-                <GridContainer>
-                    <h2>학생 화면</h2>
-                    <video id="myFace" playsInline autoPlay width="40%" height="30%" />
-                    
-                </GridContainer>
-                <ChatContainer>
-                    <ChatButton onClick={toggleChat}>{isChatOpen ? "채팅 비활성화" : "채팅 활성화"}</ChatButton>
-                    <ChatBox isopen={isChatOpen}>
-                        <ChatInput
-                        type="text"
-                        value={input}
-                        onChange={(e) => setInput(e.target.value)}
-                        placeholder="메시지 입력..."
-                        />
-                        <SendButton onClick={()=>SendMessage(input)}>전송</SendButton>
-                        <div id="chatBox"></div>
-                    </ChatBox>
-                </ChatContainer>
-            </Container>
-        );
-    };
     export default LectureRoom;
-
-    const Container = styled.div`
-        display: flex;
-    `;
-
-    const ProfessorContainer = styled.div`
-        flex: 1;
-        padding: 20px;
-        border: 1px solid black;
-    `;
-
-    const GridContainer = styled.div`
-        flex: 3;
-        padding: 20px;
-    `;
-
-    const ChatContainer = styled.div`
-        flex: 1;
-        padding: 20px;
-    `;
-
-    const ChatButton = styled.button`
-        color: black;
-        border: black;
-        padding: 10px 20px;
-        border-radius: 5px;
-        cursor: pointer;
-    `;
-
-    const ChatBox = styled.div`
-        display: ${({ isopen }) => (isopen ? 'block' : 'none')};
-        border: 1px solid black;
-    `;
-    const ChatInput = styled.input`
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
-    margin-right: 10px;
-    `;
-    const SendButton = styled.button`
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    `;
-
-

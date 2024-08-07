@@ -1,21 +1,15 @@
-import React, { useEffect, useState } from 'react'
-import styles, { keyframes, styled } from 'styled-components'
-import Login from '../components/login/login';
-import JoinBox from '../components/login/signup';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-
+import { Button} from '@radix-ui/themes/dist/cjs/index.js';
+import JoinBox from '../components/login/signup';
+import Form from '../components/login/login';
+import ProgressBar from '../hooks/ProgressBar';
 
 export default function Splash() {
-  const navigate = useNavigate()
-  const [showSplashscreen, setShowSplashscreen] = useState(false);
+  const navigate = useNavigate();
   const [loginShow, setLoginShow] = useState(true);
-  
-  useEffect(() => {
-    setTimeout(() => {
-      setShowSplashscreen(true);
-    }, 3000);
-  }, []);
-  
+  const [showSplashscreen, setShowSplashscreen] = useState(true);
+
   useEffect(() => {
     const checkTokenValidity = async () => {
       const token = localStorage.getItem('token');
@@ -25,7 +19,7 @@ export default function Splash() {
           const milliseconds = Info.exp * 1000;
           const date = new Date(milliseconds);
           const currentTime = new Date();
-  
+
           if (date > currentTime) {
             navigate('/');
           }
@@ -34,106 +28,42 @@ export default function Splash() {
         }
       }
     };
-  
+
     const interval = setInterval(checkTokenValidity, 1000);
-  
+
     return () => clearInterval(interval);
   }, [navigate]);
-  
-  const changeShow = () =>{
-    setLoginShow(!loginShow)
-  }
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplashscreen(false);
+    }, 2000); // 2 seconds
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  const changeShow = () => {
+    setLoginShow(!loginShow);
+  };
+
   return (
-    <Container>
-
+    <div className="fixed inset-0 w-full h-full bg-black flex flex-col justify-center items-center">
+      <div className="w-1/2 h-full text-white text-2xl font-bold text-center flex flex-col items-center justify-center ">
+        {showSplashscreen ? (
         
-        <MainText>
-          {!showSplashscreen ? <RotatingImage src="/logo_origin.png" alt="" width={500}/> :
-          !loginShow ? <JoinBox/> : <Login/>
-          }
-          <Btn onClick={changeShow}>{ !loginShow ?"로그인 하러가기":"회원가입 하러가기"}</Btn>
-        </MainText>
-        
-    </Container>
-  )
+        <ProgressBar />
+          
+         
+        ) : (
+          loginShow ? <Form /> : <JoinBox />
+        )}
+        <Button
+          onClick={changeShow}
+          className="w-56 bg-transparent h-8 fixed bottom-10"
+        >
+          {!loginShow ? '로그인 하러가기' : '회원가입 하러가기'}
+        </Button>
+      </div>
+    </div>
+  );
 }
-const Btn = styled.button`
-  width: 200px;
-  background-color: transparent;
-  height: 30px;
-  position: fixed;
-  bottom: 20px;
-`
-const fadeIn = keyframes`
-  from {
-    opacity: 0;
-    background-size: 10% 10%;
-  }
-  to {
-    opacity: 1;
-    background-size: 60% 90%;
-  }
-`;
-const changeBackground = keyframes`
-  from {
-    background-color: #000000;
-  }
-  to {
-    background-color: #2C363F;
-  }
-`
-const moveBackground = keyframes`
-  from {
-    background-position: center;
-  }
-  to {
-    background-position: center right;
-  }
-`;
-const rotate = keyframes`
-  from {
-    transform: rotateY(0deg);
-  }
-  to {
-    transform: rotateY(360deg);
-  }
-`;
-
-
-const RotatingImage = styled.img`
-
-  animation: ${rotate} 3s linear infinite; /* 애니메이션 지속시간 및 반복 설정 */
-`;
-const Container = styles.div`
-  position: fixed;
-  left: 0px;
-  top: 0px;
-  width: 100vw;
-  height: 100vh;
-  z-index: 99;
-  background-size: 10% 10%;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-color: #000000;
-  animation: ${changeBackground} 1s ease-in-out forwards, ${moveBackground} 1s ease-in-out 1s forwards;
-`;
-
-const MainText = styles.div`
-  width:100%;
-  height:100%;
-  font-size: 3rem;
-  font-weight: 700;
-  color: white;
-  text-align: center;
-  animation: ${fadeIn} 0s ease-in-out 1.8s forwards;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  opacity:0;
-  p{
-    font-size:24px;
-  }
-`;
-
-

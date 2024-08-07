@@ -1,41 +1,28 @@
 import React, { useEffect, useState } from 'react'
-import styled from 'styled-components';
 import useDebounce from '../../hooks/Debounce';
 
 export default function LecInput ({onSearch}){
     const [searchTerm, setSearchTerm] = useState('');
     const debouncedSearchText = useDebounce(searchTerm, 600);
+    
     useEffect(() => {
         onSearch(debouncedSearchText);
-      }, [debouncedSearchText]);
+    }, [debouncedSearchText]);
+    
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);
-      };
+    };
+    
     return (
-        <TopContainer>
-            <InputContainer>
-            <StyledInput type="text" placeholder="강의명 필터링" onChange={handleSearch} />
-            </InputContainer>
-        
-        </TopContainer>
+        <div className="flex justify-around items-center h-[70px]">
+            <div className="w-2/5 flex h-[40px]">
+                <input 
+                    type="text" 
+                    placeholder="강의명 필터링" 
+                    onChange={handleSearch}
+                    className="w-full border border-[#0ea8f09b] rounded-[10px] pl-[10px] h-full"
+                />
+            </div>
+        </div>
     );
 }
-
-const TopContainer = styled.div`
-  display:flex;
-  justify-content:space-around;
-  align-items:center;
-  height:70px;
-  `;
-const InputContainer = styled.div`
-  width:40%;
-  display:flex;
-  height:40px;
-`;
-const StyledInput = styled.input`
-  width:100%;
-  border: 1px solid #0ea8f09b;
-  border-radius:10px;
-  padding-left:10px;
-  height:100%;
-`;

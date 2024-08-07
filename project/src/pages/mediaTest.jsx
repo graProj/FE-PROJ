@@ -1,6 +1,6 @@
 import React, { useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import styled from "styled-components";
+
 
 export default function MediaTest() {
     const videoRef = useRef(null);
@@ -31,22 +31,12 @@ export default function MediaTest() {
         }
         };
     }, []);
-
     return (
-        <Container>
-        <video ref={videoRef} autoPlay playsInline width="600" height="400" />
-        <h2 onClick={()=>navigate(-1)}>돌아가기</h2>
-        </Container>
+        <div className="w-full h-full flex justify-center items-center">
+            <video ref={videoRef} autoPlay playsInline className="w-[600px] h-[400px]" />
+            <h2 onClick={() => navigate(-1)} className="cursor-pointer">돌아가기</h2>
+        </div>
     );
 }
 
-const Container = styled.div`
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  h2{
-    cursor: pointer;
-  }
-`;
+
