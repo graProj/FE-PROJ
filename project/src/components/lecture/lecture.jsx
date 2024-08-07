@@ -1,19 +1,14 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import styled from 'styled-components';
-import { Button } from '@mui/material';
-import { Add } from '@mui/icons-material';
-
+import React, { useState, useMemo } from 'react';
 import Lecbox from './lecbox';
-import LectureModal from './modal';
 import LecInput from './lecinput';
 import useLectureData from '../../api/lectureList';
-import LoadingIndicator from '../../hooks/loading';
+
 import { DeleteData } from '../../api/lectureEnrollment';
 
+
 function Lecture() {
-  const { data, isLoading, error ,refetch } = useLectureData();
+  const { data, isLoading, error  } = useLectureData();
   const mutation = DeleteData();
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchText, setSearchText] = useState('');
 
   const filteredBoxes = useMemo(() => {
@@ -35,72 +30,34 @@ function Lecture() {
     }
     
   }
-
-
+  console.log(filteredBoxes.length)
   return (
-    <Container>
-      <Title>현재 강의 중인 목록</Title>
-      <Btn onClick={() => setIsModalOpen(true)}><Add/> 강의 신청</Btn>
+    <div className="w-11/20 h-full flex flex-col">
+      <div className="w-full min-h-15 flex items-center justify-center text-2xl border-b border-gray-400">
+        현재 수강 중인 강의
+      </div>
+      
       <LecInput onSearch={handleSearch} />
-      {isLoading && <LoadingIndicator/>}
-      {!isLoading && !error && (
-        <LectureList>
-          {filteredBoxes.map((box) => (
-            <Lecbox 
-              key={box.id} 
-              name={box.lecture.owner.name} // 수정 필요할 수 있음, owner의 name 속성이 있는지 확인 필요
-              boxId={box.lecture.id} 
-              text={box.lecture.title} // lecture 객체의 title 속성 사용
-              onDelete={() => onDeleteHandler(box.lecture.title,box.lecture.id,box.member.id)} 
-            />
-            
-          ))}
-          
-        </LectureList>
-      )}
-      {isModalOpen && <LectureModal onClose={() => setIsModalOpen(false)} />}
-    </Container>
+      {!isLoading && !error ? (
+        <div className="h-[calc(100vh-225px)] flex flex-col items-center overflow-y-scroll scrollbar-hide border-r border-black px-4">
+          {filteredBoxes.length > 0 ? (
+            filteredBoxes.map((box) => (
+              <Lecbox 
+                key={box.id} 
+                name={box.lecture.owner.name} // 수정 필요할 수 있음, owner의 name 속성이 있는지 확인 필요
+                boxId={box.lecture.id} 
+                text={box.lecture.title} // lecture 객체의 title 속성 사용
+                onDelete={() => onDeleteHandler(box.lecture.title,box.lecture.id,box.member.id)} 
+              />
+            ))
+          ) : (
+            <div>수강 중인 강의가 없네요..</div>
+          )}
+        </div>
+        
+      ):(<div>Didacto 학생 전용입니다..!</div>)}
+    </div>
   )
 }
 
 export default Lecture;
-
-const Container = styled.div`
-  width: 55%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-`;
-
-const Btn = styled(Button)`
-  width: 200px;
-  height: 40px;
-  background-color: darkblue;
-  text-align: center;
-`;
-
-const Title = styled.div`
-  width: 100%;
-  min-height: 60px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  border-bottom: 1px solid #c4ae9bbb;
-`;
-
-const LectureList = styled.div`
-  height: calc(100vh - 225px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  overflow-y: scroll;
-  scrollbar-width: none;
-  -ms-overflow-style: none; 
-  &::-webkit-scrollbar {
-    display: none;
-  }
-  border-right: 1px solid black;
-  padding-left: 15px;
-  padding-right: 15px;
-`;

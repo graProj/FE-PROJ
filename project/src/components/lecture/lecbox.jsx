@@ -1,70 +1,38 @@
-import { Delete } from '@mui/icons-material';
+import { TrashIcon } from '@radix-ui/react-icons';
 import React from 'react';
-import styled from 'styled-components';
-
 
 function Lecbox({ onDelete , text, boxId, name}) {
   const handleDelete = () => {
     onDelete();
   };
-  const goLecRoom = async()=>{
-    const isJoin= window.confirm(`${text} 강의실에 참여하시겠습니까?`);
+  const goLecRoom = async()=> {
+    const isJoin = window.confirm(`${text} 강의실에 참여하시겠습니까?`);
     if(isJoin){
       window.location.href = `/home/${boxId}`
     }
-    
   }
-  const goRemoteRoom = async()=>{
-    const isJoin= window.confirm(`${text} 원격실에 참여하시겠습니까?`);
+  const goRemoteRoom = async()=> {
+    const isJoin = window.confirm(`${text} 원격실에 참여하시겠습니까?`);
     if(isJoin){
       window.location.href = `/home/room/${boxId}`
     }
-    
   }
   
   return (
-    <Container >
-      <Btn><LecText><h2>{text}</h2><p>- {name}</p><button onClick={goLecRoom}>강의실</button><button onClick={goRemoteRoom}>원격실</button></LecText></Btn>
-      <button onClick={handleDelete}><Delete/></button>
-    </Container>
+    <div className="w-[95%] h-12 border border-black m-1 rounded-lg flex items-center justify-between bg-white/60">
+      <button className="bg-transparent border-none w-[90%] flex justify-center">
+        <div className="min-w-full h-full text-black flex items-center justify-around">
+          <h2>{text}</h2>
+          <p>- {name}</p>
+          <button onClick={goLecRoom} className="border border-white rounded-lg shadow-md">강의실</button>
+          <button onClick={goRemoteRoom} className="border border-white rounded-lg shadow-md">원격실</button>
+        </div>
+      </button>
+      <button onClick={handleDelete} className="bg-transparent border-none">
+        <TrashIcon />
+      </button>
+    </div>
   );
 }
-
-const Container = styled.div`
-  width: 95%;
-  height: 50px;
-  border: 1px solid black;
-  margin: 2px;
-  border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background-color: #ffffff9a;
-  button{
-    background-color: transparent;
-    border: none;
-  }
-`;
-const Btn = styled.button`
-  background-color: transparent;
-    border: none;
-    width: 90%;
-    display: flex;
-    justify-content: center;
-`
-
-const LecText = styled.div`
-  min-width: 100%; 
-  height: 100%;
-  color: black;
-  display: flex;
-  align-items: center;
-  justify-content: space-around;
-  button{
-    border: 1px solid white;
-    border-radius: 10px;
-    box-shadow: 0 10 10 10 black;
-  }
-`;
 
 export default Lecbox;

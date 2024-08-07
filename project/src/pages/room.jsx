@@ -1,8 +1,7 @@
-import { Button } from "@mui/material";
-import React, { useEffect} from "react";
+import { Button } from "@radix-ui/themes/dist/cjs/index.js";
+import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
-import styled from "styled-components";
 
 export default function Room() {
   const socket = io("http://3.39.22.211:5004/");
@@ -69,7 +68,7 @@ export default function Room() {
           if (!source) {
             source = await window.display.source();
           }
-    
+
           stream = await navigator.mediaDevices.getUserMedia({
             audio: false,
             video: {
@@ -83,7 +82,7 @@ export default function Room() {
               },
             },
           });
-    
+
           const myFace = document.getElementById("myFace");
           myFace.srcObject = stream;
           stream
@@ -105,49 +104,59 @@ export default function Room() {
         } else if (content.event === "client_x_coordinate") {
           var xCoordinate = content.data;
           const remoteX = (xCoordinate.x * window.screen.width) / 700;
-          const remoteY = (xCoordinate.y * window.screen.height) / (700 * (window.screen.height / window.screen.width));
+          const remoteY =
+            (xCoordinate.y * window.screen.height) /
+            (700 * (window.screen.height / window.screen.width));
           console.log("Received client's X coordinate:", remoteX, remoteY);
           window.remote.source(remoteX, remoteY);
         }
       });
       socket.on("remote-event", async (message) => {
         var content = JSON.parse(message);
-        
+
         if (content.event === "client_x_coordinate") {
-          if (typeof content.data === 'object') {
-            console.log(content.data)
-            await window.remote.source(content.data.x, content.data.y, content.data.eventType);
-          } else  {          
+          if (typeof content.data === "object") {
+            console.log(content.data);
+            await window.remote.source(
+              content.data.x,
+              content.data.y,
+              content.data.eventType
+            );
+          } else {
             await window.remote.key(content.data);
           }
-          
         }
       });
-      socket.on('kick', async () => {
+      socket.on("kick", async () => {
         navigate(-1);
-      })
-     
+      });
     } catch (error) {
       console.error("Error accessing media devices:", error);
     }
   }
 
-
   return (
-    <Container>
+    <div className="fixed top-0 left-0 bg-white">
       <Button onClick={goRoom}>나가기</Button>
       <div id="result"></div>
       <input type="text" />
-      <video id="myFace" playsInline autoPlay width="600" height="600"></video>
+      <video
+        id="myFace"
+        playsInline
+        autoPlay
+        width="600"
+        height="600"
+        className="w-600 h-600"
+      ></video>
       <a href="/">Home</a>
-      <video id="peerVideo" playsInline autoPlay width="40%" height="30%"></video>
-    </Container>
+      <video
+        id="peerVideo"
+        playsInline
+        autoPlay
+        width="40%"
+        height="30%"
+        className="w-2/5 h-1/3"
+      ></video>
+    </div>
   );
 }
-
-const Container  = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  background-color: white;
-`

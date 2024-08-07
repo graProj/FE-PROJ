@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import LoadingIndicator from '../hooks/loading';
 import { Modify } from '../api/user';
 import { useNavigate } from 'react-router-dom';
@@ -33,85 +32,44 @@ export default function ModifyUser() {
       setIsLoading(false); // 로딩 상태를 다시 false로 변경합니다.
     }
   };
-
   return (
-    <Container>
-      
-      <FR onSubmit={handleSubmit}>
-        회원정보 수정
-        <Input
+    <div className="w-screen h-[70vh] text-center text-2xl">
+      <form onSubmit={handleSubmit} className="pt-5 flex flex-col justify-between items-center w-full h-full">
+        <h2 className="mb-4">회원정보 수정</h2>
+        <input
           type="text"
           placeholder="password"
           name="password"
-          value={formData.email}
+          value={formData.password}
           onChange={handleInputChange}
+          className="bg-transparent rounded-lg w-1/2 h-8 text-white mb-4 border-2 border-slate-300"
         />
-        <Input
+        <input
           type="text"
           placeholder="name"
           name="name"
           value={formData.name}
           onChange={handleInputChange}
+          className="bg-transparent rounded-lg w-1/2 h-8 text-white mb-4 border-2 border-slate-300"
         />
-        <Input
+        <input
           type='text'
           placeholder="birth(ex:YYYYMMDD)"
           maxLength={8}
           name="birth"
           value={formData.birth}
           onChange={handleInputChange}
+          className="bg-transparent rounded-lg w-1/2 h-8 text-white mb-4 border-2 border-slate-300"
         />
-        <Btn type="submit" disabled={isLoading}>수정하기</Btn>
-      </FR>
+        <button 
+          type="submit" 
+          disabled={isLoading}
+          className="w-52 py-2 rounded-md text-black bg-stone-50 transition-colors duration-300 hover:bg-slate-700 focus:bg-slate-700 disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          수정하기
+        </button>
+      </form>
       {isLoading && <LoadingIndicator />}
-    </Container>
+    </div>
   );
 }
-
-const Btn = styled.button`
-  width: 200px;
-  padding: 8px;
-  border: none;
-  border-radius: 5px;
-  outline: none;
-  cursor: pointer;
-  color: #fff;
-  background-color: #3b82f6;
-  transition: background-color 0.3s, color 0.3s;
-
-  &:hover,
-  &:focus {
-    background-color: #2563eb;
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-    background-color: #3b82f6;
-  }
-`;
-
-const Container = styled.div`
-  width: 100vw;
-  height: 70vh;
-  text-align: center;
-  font-size: 28px;
-`;
-
-const FR = styled.form`
-  padding-top: 20px;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-`;
-
-const Input = styled.input`
-  background-color: transparent;
-  border-radius: 10px;
-  width: 50%;
-  height: 30px;
-  color: white;
-`;
