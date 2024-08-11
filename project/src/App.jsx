@@ -7,7 +7,7 @@ import './index.css';
 
 const App = () => {
     useEffect(() => {
-        
+        console.log(window.location.href);
     }, []);
 
     return (

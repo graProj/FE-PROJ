@@ -11,10 +11,10 @@ function LectureRoom() {
     const roomId = parseInt(id, 10);
 
     setInterval(async () => {
-        let source = await window.display.image();
-        sendImage(roomId,`data:image/jpeg;base64,${source}`);
-        console.log(source)
-      }, 8000);
+      let source = await window.display.image();
+      sendImage(roomId, source);
+      console.log(source);
+    }, 8000);
 
     return (
         <div className="flex">

@@ -11,14 +11,16 @@ export default function Header() {
     localStorage.removeItem('rtk');
     navigate('/auth');
   }
-  
+  const goHome = () =>{
+    navigate('/')
+  }
 
   return (
     <>
       <div className={`h-12 flex justify-between px-4 items-center border-b-2 `}>
-        <a className="w-1/5 cursor-pointer" href='/'>
-          <img src="/logo.png" alt="awef" width={60} />
-        </a>
+        <div className='cursor-pointer' onClick={goHome}>
+          <img src='' alt="awef" width={60} />
+        </div>
         <div className="w-2/5 h-full flex items-center justify-end">
           <Button onClick={logout}>로그아웃</Button>
         </div>

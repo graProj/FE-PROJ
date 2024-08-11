@@ -4,6 +4,8 @@ import { ArrowRightIcon } from "@radix-ui/react-icons";
 import { cn } from "../../lib/utils";
 import { Button } from "./button";
 import AnimatedShinyText from './animatedText';
+import { useNavigate } from 'react-router-dom';
+
 
 const BentoGrid = ({ className, children }) => {
   return (
@@ -31,7 +33,14 @@ const BentoCard = ({
     description,
     href,
     cta,
-  }) => (
+  }) => {
+  const navigate = useNavigate();
+
+  const linkHandler = (ref) => {
+    navigate(ref);
+  }
+ return (
+    
     <div
     key={name}
     className={cn(
@@ -58,17 +67,18 @@ const BentoCard = ({
       )}
     >
       <Button variant="ghost" asChild size="sm" className="pointer-events-auto">
-        <a href={href}>
+        <div onClick={()=>linkHandler(href)}>
         <AnimatedShinyText className="inline-flex items-center justify-center px-4 py-1 transition ease-out hover:text-neutral-600 hover:duration-300 hover:dark:text-neutral-400">
           <span>ENTER</span>
           <ArrowRightIcon className="ml-1 size-3 transition-transform duration-300 ease-in-out group-hover:translate-x-0.5" />
         </AnimatedShinyText>
-        </a>
+        </div>
       </Button>
     </div>
     <div className="pointer-events-none absolute inset-0 transform-gpu transition-all duration-300 group-hover:bg-black/[.03] group-hover:dark:bg-neutral-800/10" />
   </div>
-  );
+  )
+};
 
 BentoCard.propTypes = {
   name: PropTypes.string.isRequired,
