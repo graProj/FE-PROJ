@@ -30,7 +30,6 @@ function Lecture() {
     }
     
   }
-  console.log(filteredBoxes.length)
   return (
     <div className="w-11/20 h-full flex flex-col">
       <div className="w-full min-h-15 flex items-center justify-center text-2xl border-b border-gray-400">
@@ -44,9 +43,9 @@ function Lecture() {
             filteredBoxes.map((box) => (
               <Lecbox 
                 key={box.id} 
-                name={box.lecture.owner.name} // 수정 필요할 수 있음, owner의 name 속성이 있는지 확인 필요
+                name={box.lecture.owner.name} 
                 boxId={box.lecture.id} 
-                text={box.lecture.title} // lecture 객체의 title 속성 사용
+                text={box.lecture.title} 
                 onDelete={() => onDeleteHandler(box.lecture.title,box.lecture.id,box.member.id)} 
               />
             ))

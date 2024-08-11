@@ -9,10 +9,6 @@ const signUp = async (formData) => {
       body: JSON.stringify(formData),
     });
 
-    if (!response.ok) {
-      throw new Error();
-    }
-
     const data = await response.json();
     return data;
   } catch (error) {

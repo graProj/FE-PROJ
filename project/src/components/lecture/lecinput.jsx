@@ -7,7 +7,7 @@ export default function LecInput ({onSearch}){
     
     useEffect(() => {
         onSearch(debouncedSearchText);
-    }, [debouncedSearchText]);
+    }, [debouncedSearchText, onSearch]); // Added onSearch to the dependency array
     
     const handleSearch = (event) => {
         setSearchTerm(event.target.value);

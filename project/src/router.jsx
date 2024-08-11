@@ -1,7 +1,6 @@
-import { createBrowserRouter } from 'react-router-dom';
+import { createHashRouter } from 'react-router-dom';
 
 import PrivateRoutes from './layout/layout';
-
 import Room from './pages/room';
 import Notfound from './pages/notfound';
 import Home from './pages/home';
@@ -12,7 +11,8 @@ import MediaTest from './pages/mediaTest';
 import Search from './pages/search';
 import LectureInfo from './pages/lectureInfo';
 import RemoteInfo from './pages/remoteInfo';
-const router = createBrowserRouter([
+
+const router = createHashRouter([
   {
     path: '/',
     element: <PrivateRoutes />,
@@ -22,31 +22,31 @@ const router = createBrowserRouter([
         element: <Home />,
       },
       {
-        path: '/home/lectureinfo',
+        path: 'home/lectureinfo',
         element: <LectureInfo />
       },
       {
-        path: '/home/remoteinfo',
+        path: 'home/remoteinfo',
         element: <RemoteInfo />
       },
       {
-        path: '/home/room/:id',
+        path: 'home/room/:id',
         element: <Room />
       },
       {
-        path: '/home/:id', 
+        path: 'home/:id', 
         element: <LectureRoom />
       },
       {
-        path: '/home/info', 
+        path: 'home/info', 
         element: <ModifyUser />
       },
       {
-        path: '/home/testroom', 
+        path: 'home/testroom', 
         element: <MediaTest />
       },
       {
-        path: '/home/search', 
+        path: 'home/search', 
         element: <Search/>
       },
     ],
@@ -56,9 +56,9 @@ const router = createBrowserRouter([
     element: <Splash />
   },
   {
-    path: "*",
+    path: '*',
     element: <Notfound />
-  },
+  }
 ]);
 
 export default router;

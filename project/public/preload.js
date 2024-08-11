@@ -9,6 +9,10 @@ contextBridge.exposeInMainWorld('display', {
     console.log("sourId:",sourceId)
     
     return sourceId;
+  },
+  image: async () => {
+    const source = ipcRenderer.sendSync('image');
+    return source;
   }
    
 })

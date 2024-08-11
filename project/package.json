@@ -31,10 +31,10 @@
     "web-vitals": "^2.1.4",
     "zustand": "^4.5.2"
   },
-  "main": "build/main.js",
+  "main": "public/main.js",
   "homepage": "./",
   "scripts": {
-    "start": "concurrently \"react-scripts start\" \"npm run electron\" ",
+    "dev": "concurrently \"react-scripts start\" \"npm run electron\" ",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
