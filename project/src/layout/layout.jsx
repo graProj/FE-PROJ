@@ -1,13 +1,12 @@
 // ProtectedRoutes.js
 
-import { Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
 import '../index.css';
 import Header from "../components/header";
 import { useEffect, useState } from "react";
 import { refreshTokenIfNeeded } from "../api/login";
 
 const ProtectedRoutes = () => {
-  const location = useLocation();
   const localStorageToken = localStorage.getItem("token");
   const [isLoading, setIsLoading] = useState(true);
   const [lastRefreshTime, setLastRefreshTime] = useState(0);
@@ -41,7 +40,7 @@ const ProtectedRoutes = () => {
     const interval = setInterval(checkTokenValidity, 300*1000);
 
     return () => clearInterval(interval);
-  }, [localStorageToken]);
+  }, [localStorageToken, lastRefreshTime, navigate]); // Added missing dependencies
 
   if (isLoading) {
     return <div>Loading...</div>;

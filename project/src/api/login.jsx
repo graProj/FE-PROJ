@@ -11,7 +11,12 @@ const signIn = async (formData, setLoading) => {
       body: JSON.stringify(formData),
     });
     console.log(response)
-
+    if(response.status===401){
+      alert("Didacto의 회원이 아닙니다.");
+    }
+    if(response.status===422){
+      alert("아이디를 입력해주세요.");
+    }
     const data = await response.json();
     if (data.response.accessToken) {
       localStorage.setItem('token', data.response.accessToken);
@@ -21,13 +26,7 @@ const signIn = async (formData, setLoading) => {
     return data;
 
   } catch (error) {
-    console.log(error)
-    if(error.response.errorcode==='ERR_05'){
-      alert("비밀번호가 일치하지 않습니다");
-    }
-    else if(error.response.errorcode==='ERR_04'){
-      alert("해당 이메일을 찾을 수 없습니다.");
-    }
+    alert("로그인 중 오류가 발생했습니다. 다시 시도해주세요.");
   } finally {
     setLoading(false);
   }
@@ -50,15 +49,9 @@ const refreshTokenIfNeeded = async () => {
     if (response.status===200) {
       localStorage.setItem('token', data.response.accessToken);
     }
-    
-
   } catch (error) {
-    if (error.response.status===403) {
-      alert("세션이 만료되었습니다.");
-      localStorage.removeItem('token');
-    }
-    throw error;
   }
+  
 };
 
 export { signIn, refreshTokenIfNeeded };

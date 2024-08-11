@@ -1,28 +1,25 @@
 import {
     ArchiveIcon,
-  } from "@radix-ui/react-icons"
-  
-  import {
-    Command,
-    CommandEmpty,
-    CommandGroup,
-    CommandInput,
-    CommandItem,
-    CommandList,
-    CommandSeparator,
-    CommandShortcut,
-  } from "../ui/command"
-import { useQueryClient } from "@tanstack/react-query";
+} from "@radix-ui/react-icons"
 import { useState } from "react";
-import useSearchData from "../../api/searchlecture";
-import { postData } from "../../api/lectureEnrollment";
+
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
+} from "../ui/command"
 import { Button } from "@radix-ui/themes";
 
+import useSearchData from "../../api/searchlecture";
+import { postData } from "../../api/lectureEnrollment";
+
 export function CommandComp() {
-    const [roomTitle, setroomTitle] = useState('');
-    const [searchText, setSearchText] = useState('');
-    const queryClient = useQueryClient();
-    const { data, isLoading, error } = useSearchData(searchText);
+    const [searchText] = useState('');
+    const { data, isLoading} = useSearchData(searchText);
 
     const onSubmitHandler = (title,id) =>{
         const isEnrolled= window.confirm(`${title} 신청하시겠습니까?`);

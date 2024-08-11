@@ -4,8 +4,7 @@ import { Command as CommandPrimitive } from "cmdk"
 import { Search } from "lucide-react"
 import { Dialog, DialogContent } from "../ui/dialog"
 import { cn } from "../../lib/utils"
-import { ArchiveIcon } from '@radix-ui/react-icons';
-import { Button } from '@radix-ui/themes/dist/cjs/index.js';
+
 const Command = React.forwardRef(({ className, ...props }, ref) => (
   <CommandPrimitive
     ref={ref}
