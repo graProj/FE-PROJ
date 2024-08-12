@@ -11,7 +11,7 @@ app.whenReady().then(() => {
     },
   });
   // Ensure this path is correct and points to your React app's entry point
-  mainWindow.loadURL('http://localhost:3000');
+  mainWindow.loadFile(`${path.join(__dirname, "../build/index.html")}`);
 
   ipcMain.on('ping', async (event) => {
     const sources = await desktopCapturer.getSources({ types: ['window', 'screen'] });
