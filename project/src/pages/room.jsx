@@ -1,10 +1,9 @@
-import { Button } from "@radix-ui/themes/dist/cjs/index.js";
-import React, { useEffect } from "react";
+import React, { useEffect} from "react";
 import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 
 export default function Room() {
-  const socket = io("http://3.39.22.211:5004/");
+  const socket = io("http://3.38.214.160:5004");
   const navigate = useNavigate();
   const room = "didacto3";
   const configuration = {
@@ -21,18 +20,14 @@ export default function Room() {
   let source = null;
   useEffect(() => {
     getMedia();
+    return () => {
+      if (myPeerConnection) {
+        myPeerConnection.close();
+        myPeerConnection = null;
+      }
+    };
   }, []);
-  window.addEventListener("beforeunload", function () {
-    if (myPeerConnection && myPeerConnection.connectionState !== "closed") {
-      myPeerConnection.close();
-      console.log("연결끊음");
-    }
-  });
   myPeerConnection.addEventListener("addstream", handleAddStream);
-
-  function goRoom() {
-    navigate(-1);
-  }
   function handleAddStream(data) {
     console.log("Receive Streaming Data!");
     var peerVideo = document.getElementById("peerVideo");
@@ -68,7 +63,7 @@ export default function Room() {
           if (!source) {
             source = await window.display.source();
           }
-
+    
           stream = await navigator.mediaDevices.getUserMedia({
             audio: false,
             video: {
@@ -82,7 +77,7 @@ export default function Room() {
               },
             },
           });
-
+    
           const myFace = document.getElementById("myFace");
           myFace.srcObject = stream;
           stream
@@ -104,30 +99,33 @@ export default function Room() {
         } else if (content.event === "client_x_coordinate") {
           var xCoordinate = content.data;
           const remoteX = (xCoordinate.x * window.screen.width) / 700;
-          const remoteY =
-            (xCoordinate.y * window.screen.height) /
-            (700 * (window.screen.height / window.screen.width));
+          const remoteY = (xCoordinate.y * window.screen.height) / (700 * (window.screen.height / window.screen.width));
           console.log("Received client's X coordinate:", remoteX, remoteY);
           window.remote.source(remoteX, remoteY);
         }
       });
       socket.on("remote-event", async (message) => {
         var content = JSON.parse(message);
-
+        
         if (content.event === "client_x_coordinate") {
-          if (typeof content.data === "object") {
-            console.log(content.data);
-            await window.remote.source(
-              content.data.x,
-              content.data.y,
-              content.data.eventType
-            );
-          } else {
+          if (typeof content.data === 'object') {
+            console.log(content.data)
+            await window.remote.source(content.data.x, content.data.y, content.data.eventType);
+          } else  {          
             await window.remote.key(content.data);
           }
+          
         }
       });
-      socket.on("kick", async () => {
+      socket.on('kick', async (data) => {
+        navigate(-1);
+      })
+      socket.on('disconnect', () => {
+        navigate(-1);
+      });
+
+    // 시작부터 연결이 안될 경우
+      socket.on('connect_error', function() {
         navigate(-1);
       });
     } catch (error) {
@@ -135,28 +133,14 @@ export default function Room() {
     }
   }
 
+
   return (
-    <div className="fixed top-0 left-0 bg-white">
-      <Button onClick={goRoom}>나가기</Button>
+    <div id="box">
       <div id="result"></div>
       <input type="text" />
-      <video
-        id="myFace"
-        playsInline
-        autoPlay
-        width="600"
-        height="600"
-        className="w-600 h-600"
-      ></video>
+      <video id="myFace" playsInline autoPlay width="600" height="600"></video>
       <a href="/">Home</a>
-      <video
-        id="peerVideo"
-        playsInline
-        autoPlay
-        width="40%"
-        height="30%"
-        className="w-2/5 h-1/3"
-      ></video>
+      <video id="peerVideo" playsInline autoPlay width="40%" height="30%"></video>
     </div>
   );
 }
