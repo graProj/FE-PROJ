@@ -14,14 +14,15 @@ app.whenReady().then(() => {
   mainWindow.loadFile(`${path.join(__dirname, "../build/index.html")}`);
 
   ipcMain.on('ping', async (event)=>{
-    const sources = await desktopCapturer.getSources({ types: ['window', 'screen'] });
-    for (const source of sources) {
-      console.log(source)
-      if (source.id === 'screen:0:0') {
-        console.log(source.id)
-        event.returnValue = source.id
-      }
-  }});
+    const sources = await desktopCapturer.getSources({ types: ['screen'] });
+    event.returnValue = sources[0].id
+    // for (const source of sources) {
+    //   console.log(source)
+    //   if (source.id === 'screen:0:0') {
+    //     console.log(source.id)
+    //     event.returnValue = source.id
+    //   }
+  });
 
   mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
     console.error('Failed to load:', errorDescription);

@@ -28,6 +28,15 @@ export default function Room() {
     };
   }, []);
   myPeerConnection.addEventListener("addstream", handleAddStream);
+
+  myPeerConnection.onicecandidate = function(event) {
+    console.log("Send Candidate");
+    Send({
+        event: "candidate",
+        data: event.candidate
+    })
+  }
+
   function handleAddStream(data) {
     console.log("Receive Streaming Data!");
     var peerVideo = document.getElementById("peerVideo");
