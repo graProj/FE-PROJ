@@ -4,10 +4,9 @@ const { ipcRenderer } = require('electron/renderer');
 
     
 contextBridge.exposeInMainWorld('display', {
-  source: async() => { 
-    const sourceId = ipcRenderer.sendSync('ping'); 
-    console.log("sourId:",sourceId)
-    
+  source: async () => { 
+    const sourceId = await ipcRenderer.invoke('ping'); 
+    console.log("sourceId:", sourceId);
     return sourceId;
   },
   image: async () => {
