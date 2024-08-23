@@ -45,7 +45,7 @@ const refreshTokenIfNeeded = async () => {
     });
 
     const data = await response.json();
-    console.log("했나?")
+    console.log("이거 한건가?")
     console.log(data)
     if (response.status===200) {
       localStorage.setItem('token', data.response.accessToken);

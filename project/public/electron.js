@@ -1,7 +1,6 @@
-const { app, BrowserWindow, ipcMain, desktopCapturer } = require('electron/main')
-const path = require('node:path')
+const { app, BrowserWindow, ipcMain, desktopCapturer } = require('electron/main');
+const path = require('node:path');
 const robot = require("@hurdlegroup/robotjs");
-
 
 app.whenReady().then(() => {
   mainWindow = new BrowserWindow({
@@ -12,23 +11,8 @@ app.whenReady().then(() => {
     },
   });
   // Ensure this path is correct and points to your React app's entry point
-  mainWindow.loadFile(path.join(__dirname, '../build/index.html'));
+  mainWindow.loadFile(`${path.join(__dirname, "../build/index.html")}`);
 
-  ipcMain.on('open-new-window', (event, relativeUrl) => {
-    const newWindow = new BrowserWindow({
-      width: 800,
-      height: 600,
-      webPreferences: {
-        preload: path.join(__dirname, 'preload.js'),
-        contextIsolation: true,
-        enableRemoteModule: false,
-      },
-    });
-
-    const fullUrl = `file://${path.join(__dirname, '../build/index.html')}#${relativeUrl}`;
-    console.log(fullUrl);
-    newWindow.loadURL(fullUrl);
-  });
   ipcMain.handle('ping', async () => {
     const sources = await desktopCapturer.getSources({ types: ['screen'] });
     // for (const source of sources) {
@@ -73,13 +57,10 @@ app.whenReady().then(() => {
   ipcMain.on('image', async (event) => {
     try {
       const sources = await desktopCapturer.getSources({ types: ['window', 'screen'] });
-      for (const source of sources) {
-        if (source.id === 'screen:0:0') {
-          console.log('Captured screen at', new Date());
-          const image = source.thumbnail.toDataURL();
-          event.returnValue = image;
-        }
-      }
+      const source = sources[0];
+      const image = source.thumbnail.toDataURL();
+      event.returnValue = image;
+      
     } catch (error) {
       console.error('Error capturing screen:', error);
       event.returnValue = null;

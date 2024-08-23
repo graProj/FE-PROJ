@@ -4,7 +4,8 @@ import { io } from "socket.io-client";
 
 export default function Room() {
   const socket = io("http://3.38.214.160:5004");
-  const { remoteId } = useParams();
+  const { id,remoteId } = useParams();
+  console.log(id)
   const navigate = useNavigate();
   const room = `${ remoteId}`;
   console.log("Room ID:", room); // 추가된 로그
@@ -114,8 +115,8 @@ export default function Room() {
           await myPeerConnection.addIceCandidate(content.data);
         } else if (content.event === "client_x_coordinate") {
           var xCoordinate = content.data;
-          const remoteX = (xCoordinate.x * window.screen.width) / 700;
-          const remoteY = (xCoordinate.y * window.screen.height) / (700 * (window.screen.height / window.screen.width));
+          const remoteX = (xCoordinate.x * window.screen.width) / 1000;
+          const remoteY = (xCoordinate.y * window.screen.height) / (1000 * (window.screen.height / window.screen.width));
           console.log("Received client's X coordinate:", remoteX, remoteY);
           window.remote.source(remoteX, remoteY);
         }

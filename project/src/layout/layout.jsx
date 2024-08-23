@@ -11,7 +11,6 @@ const ProtectedRoutes = () => {
   const refreshToken = localStorage.getItem("rtk");
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  console.log(window.location.href)
   useEffect(() => {
     
     const checkTokenValidity = async () => {
