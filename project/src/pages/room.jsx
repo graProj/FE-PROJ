@@ -1,11 +1,13 @@
 import React, { useEffect} from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client";
 
 export default function Room() {
   const socket = io("http://3.38.214.160:5004");
+  const { remoteId } = useParams();
   const navigate = useNavigate();
-  const room = "didacto3";
+  const room = `${ remoteId}`;
+  console.log("Room ID:", room); // 추가된 로그
   const configuration = {
     iceServers: [
       {
@@ -13,6 +15,9 @@ export default function Room() {
       },
     ],
   };
+  useEffect(() => {
+    console.log(window.location.href);
+}, []);
   let myPeerConnection = new RTCPeerConnection(configuration);
   let offer = null;
   let answer = null;
@@ -79,12 +84,14 @@ export default function Room() {
               mandatory: {
                 chromeMediaSource: "desktop",
                 chromeMediaSourceId: source,
-                minWidth: 1280,
-                maxWidth: 1280,
-                minHeight: 720,
-                maxHeight: 720,
+                minWidth: 1920, // 해상도 높이기
+                maxWidth: 1920, // 해상도 높이기
+                minHeight: 1080, // 해상도 높이기
+                maxHeight: 1080, // 해상도 높이기
               },
+
             },
+
           });
     
           const myFace = document.getElementById("myFace");
@@ -144,12 +151,10 @@ export default function Room() {
 
 
   return (
-    <div id="box">
+    <div id="box" className="fixed top-0 left-0 w-screen h-screen bg-black">
       <div id="result"></div>
-      <input type="text" />
-      <video id="myFace" playsInline autoPlay width="600" height="600"></video>
-      <a href="/">Home</a>
-      <video id="peerVideo" playsInline autoPlay width="40%" height="30%"></video>
+      <video id="myFace" playsInline autoPlay width="600" height="600" className="hidden"></video>
+      <video id="peerVideo" playsInline autoPlay width="40%" height="30%" ></video>
     </div>
   );
 }

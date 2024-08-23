@@ -9,7 +9,6 @@ export default function Splash() {
   const navigate = useNavigate();
   const [loginShow, setLoginShow] = useState(true);
   const [showSplashscreen, setShowSplashscreen] = useState(true);
-  const [role, setRole] = useState(null);
   useEffect(() => {
     const checkTokenValidity = async () => {
       const token = localStorage.getItem('token');
@@ -22,7 +21,6 @@ export default function Splash() {
           const currentTime = new Date();
 
           if (role === 'ROLE_USER' && date > currentTime) {
-            setRole(role); // Set role state
             navigate('/');
           }
           else{

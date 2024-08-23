@@ -30,7 +30,7 @@ const router = createHashRouter([
         element: <RemoteInfo />
       },
       {
-        path: 'home/room/:id',
+        path: 'home/room/:remoteId',
         element: <Room />
       },
       {
