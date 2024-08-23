@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { refreshTokenIfNeeded, signIn } from '../../api/login';
+import {signIn } from '../../api/login';
 
 import LoadingIndicator from '../../hooks/loading';
 
@@ -22,7 +22,6 @@ export default function Form() {
     try {
       setIsLoading(true);
       await signIn(formData, setIsLoading);
-      await refreshTokenIfNeeded()
     } catch (error) {
       console.error(error);
     } finally {

@@ -8,10 +8,38 @@ import { refreshTokenIfNeeded } from "../api/login";
 
 const ProtectedRoutes = () => {
   const localStorageToken = localStorage.getItem("token");
+  const refreshToken = localStorage.getItem("rtk");
   const [isLoading, setIsLoading] = useState(true);
-  const [lastRefreshTime, setLastRefreshTime] = useState(0);
   const navigate = useNavigate();
-  
+  console.log(refreshToken)
+  useEffect(() => {
+    
+    const checkTokenValidity = async () => {
+      if (refreshToken) {
+        try {
+          const Info = JSON.parse(atob(refreshToken.split('.')[1]));
+          const milliseconds = Info.exp * 1000;
+          const date = new Date(milliseconds);
+          const currentTime = new Date();
+          console.log("rtk:",date)
+          // 토큰 만료 5분 전에만 재발급 시도
+          if ( date < currentTime ) {
+            localStorage.removeItem('token');
+            localStorage.removeItem('rtk');
+            navigate('/auth');
+          }
+        } catch (error) {
+        }
+      }
+      setIsLoading(false); 
+    };
+
+    checkTokenValidity(); 
+
+    const interval = setInterval(checkTokenValidity, 300*1000);
+
+    return () => clearInterval(interval);
+  }, []);
   useEffect(() => {
     const checkTokenValidity = async () => {
       if (localStorageToken) {
@@ -21,15 +49,16 @@ const ProtectedRoutes = () => {
           const date = new Date(milliseconds);
           const currentTime = new Date();
           // 토큰 만료 5분 전에만 재발급 시도
-          if (date - currentTime < 5 * 60 * 1000 && currentTime - lastRefreshTime > 5 * 60 * 1000) {
+          if (date - currentTime < 5 * 60 * 1000) {
             await refreshTokenIfNeeded();
-            setLastRefreshTime(Date.now()); // 마지막 갱신 시간 업데이트
           }
         } catch (error) {
-          console.error('Error decoding token:', error);
+          localStorage.removeItem('token');
+          localStorage.removeItem('rtk');
           navigate('/auth');
         }
-      } else {
+      }
+       else {
         navigate('/auth');
       }
       setIsLoading(false); 
@@ -40,7 +69,7 @@ const ProtectedRoutes = () => {
     const interval = setInterval(checkTokenValidity, 300*1000);
 
     return () => clearInterval(interval);
-  }, [localStorageToken, lastRefreshTime, navigate]); // Added missing dependencies
+  }, [localStorageToken,navigate]); // Added missing dependencies
 
   if (isLoading) {
     return <div>Loading...</div>;

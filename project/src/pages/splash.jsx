@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Button} from '@radix-ui/themes/dist/cjs/index.js';
 import JoinBox from '../components/login/signup';
 import Form from '../components/login/login';
 import ProgressBar from '../hooks/ProgressBar';
+import { Button } from '@radix-ui/themes';
 
 export default function Splash() {
   const navigate = useNavigate();
   const [loginShow, setLoginShow] = useState(true);
   const [showSplashscreen, setShowSplashscreen] = useState(true);
-
+  const [role, setRole] = useState(null);
   useEffect(() => {
     const checkTokenValidity = async () => {
       const token = localStorage.getItem('token');
@@ -17,11 +17,19 @@ export default function Splash() {
         try {
           const Info = JSON.parse(atob(token.split('.')[1]));
           const milliseconds = Info.exp * 1000;
+          const role = Info.auth;
           const date = new Date(milliseconds);
           const currentTime = new Date();
 
-          if (date > currentTime) {
+          if (role === 'ROLE_USER' && date > currentTime) {
+            setRole(role); // Set role state
             navigate('/');
+          }
+          else{
+            localStorage.removeItem('token');
+            localStorage.removeItem('rtk');
+            navigate('/auth');
+            window.location.reload();
           }
         } catch {
           navigate('/auth');
@@ -50,10 +58,7 @@ export default function Splash() {
     <div className="fixed inset-0 w-full h-full bg-black flex flex-col justify-center items-center">
       <div className="w-1/2 h-full text-white text-2xl font-bold text-center flex flex-col items-center justify-center ">
         {showSplashscreen ? (
-        
-        <ProgressBar />
-          
-         
+          <ProgressBar />
         ) : (
           loginShow ? <Form /> : <JoinBox />
         )}
@@ -61,8 +66,11 @@ export default function Splash() {
           onClick={changeShow}
           className="w-56 bg-transparent h-8 fixed bottom-10"
         >
+          
           {!loginShow ? '로그인 하러가기' : '회원가입 하러가기'}
+          
         </Button>
+        <h4 className='text-gray-600'>학생 전용입니다.</h4>
       </div>
     </div>
   );
