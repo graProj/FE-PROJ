@@ -45,14 +45,10 @@ const refreshTokenIfNeeded = async () => {
     });
 
     const data = await response.json();
-    console.log("이거 한건가?")
-    console.log(data)
     if (response.status===200) {
       localStorage.setItem('token', data.response.accessToken);
-      localStorage.setItem('rtk', data.response.refreshToken);
     }
     if (response.status===403) {
-      console.log("이거함?")
       localStorage.removeItem('token');
       localStorage.removeItem('rtk');
       window.location.href('/auth');

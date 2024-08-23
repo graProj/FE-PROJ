@@ -16,9 +16,6 @@ export default function Room() {
       },
     ],
   };
-  useEffect(() => {
-    console.log(window.location.href);
-}, []);
   let myPeerConnection = new RTCPeerConnection(configuration);
   let offer = null;
   let answer = null;
