@@ -1,8 +1,9 @@
 const { contextBridge} = require('electron');
 const { ipcRenderer } = require('electron/renderer');
 
-
-    
+contextBridge.exposeInMainWorld('electron', {
+  openNewWindow: (relativeUrl) => ipcRenderer.send('open-new-window', relativeUrl),
+});
 contextBridge.exposeInMainWorld('display', {
   source: async () => { 
     const sourceId = await ipcRenderer.invoke('ping'); 
@@ -19,8 +20,8 @@ contextBridge.exposeInMainWorld('remote', {
   source: (remoteX, remoteY, eventType) => {
     const width = window.screen.width * window.devicePixelRatio;
     const height = window.screen.height * window.devicePixelRatio;
-    remoteX =  remoteX * (width/700);
-    remoteY = remoteY*(height/(700*(height/ width)));
+    remoteX =  remoteX * (width/1000);
+    remoteY = remoteY*(height/(1000*(height/ width)));
     ipcRenderer.send('remote-coordinates', { remoteX, remoteY ,eventType });
   },
   key: (pressedKey) => { 

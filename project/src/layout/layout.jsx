@@ -11,7 +11,7 @@ const ProtectedRoutes = () => {
   const refreshToken = localStorage.getItem("rtk");
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
-  console.log(refreshToken)
+  console.log(window.location.href)
   useEffect(() => {
     
     const checkTokenValidity = async () => {
@@ -21,7 +21,6 @@ const ProtectedRoutes = () => {
           const milliseconds = Info.exp * 1000;
           const date = new Date(milliseconds);
           const currentTime = new Date();
-          console.log("rtk:",date)
           // 토큰 만료 5분 전에만 재발급 시도
           if ( date < currentTime ) {
             localStorage.removeItem('token');
