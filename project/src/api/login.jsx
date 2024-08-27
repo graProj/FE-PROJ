@@ -10,23 +10,24 @@ const signIn = async (formData, setLoading) => {
       },
       body: JSON.stringify(formData),
     });
-    console.log(response)
+    let message = "An unexpected error occurred.";
     if(response.status===401){
-      alert("Didacto의 회원이 아닙니다.");
+      message = "Didacto의 회원이 아닙니다.";
     }
     if(response.status===422){
-      alert("아이디를 입력해주세요.");
+      message = "아이디를 입력해주세요.";
     }
     const data = await response.json();
     if (data.response.accessToken) {
       localStorage.setItem('token', data.response.accessToken);
       localStorage.setItem('rtk', data.response.refreshToken);
+      return { success: true, data, message: "로그인 성공" };
     }
 
-    return data;
+    return { success: false, message };
 
   } catch (error) {
-    alert("로그인 중 오류가 발생했습니다. 다시 시도해주세요.");
+    return { success: false, message: "An unexpected error occurred." };
   } finally {
     setLoading(false);
   }
