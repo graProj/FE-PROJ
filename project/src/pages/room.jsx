@@ -9,7 +9,6 @@ export default function Room() {
   
   const navigate = useNavigate();
   const room = `${ remoteId}`;
-  console.log("Room ID:", room); // 추가된 로그
   const configuration = {
     iceServers: [
       {
@@ -17,17 +16,21 @@ export default function Room() {
       },
     ],
   };
+  
   let myPeerConnection = new RTCPeerConnection(configuration);
+
   let offer = null;
   let answer = null;
   let stream = null;
   let source = null;
+  let peerVideo = null;
   const goBack = ()=>{
     navigate('/');
     window.location.reload();
   }
   useEffect(() => {
     getMedia();
+    myPeerConnection.addEventListener("iceconnectionstatechange", handleConnectionStateChange);
     return () => {
       if (myPeerConnection) {
         myPeerConnection.close();
@@ -35,6 +38,12 @@ export default function Room() {
       }
     };
   }, []);
+  function handleConnectionStateChange() {
+    if (myPeerConnection.iceConnectionState === "disconnected" && peerVideo!==null) {
+      console.log("Peer connection lost. Reloading page.");
+      peerVideo.srcObject=null
+    }
+  }
   myPeerConnection.addEventListener("addstream", handleAddStream);
 
   myPeerConnection.onicecandidate = function(event) {
@@ -47,10 +56,13 @@ export default function Room() {
 
   function handleAddStream(data) {
     console.log("Receive Streaming Data!");
-    var peerVideo = document.getElementById("peerVideo");
+    peerVideo = document.getElementById("peerVideo");
     peerVideo.srcObject = data.stream;
   }
+  if (myPeerConnection.iceConnectionState === "disconnected" && peerVideo.srcObject!==null) {
 
+    peerVideo.srcObject=null
+  }
   async function Send(message) {
     const data = {
       roomId: room,
@@ -99,6 +111,7 @@ export default function Room() {
     
           const myFace = document.getElementById("myFace");
           myFace.srcObject = stream;
+
           stream
             .getTracks()
             .forEach((track) => myPeerConnection.addTrack(track, stream));
@@ -140,7 +153,7 @@ export default function Room() {
         navigate(-1);
       })
       socket.on('disconnect', () => {
-        navigate(-1);
+        window.location.reload();
       });
 
     // 시작부터 연결이 안될 경우

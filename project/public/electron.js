@@ -31,14 +31,20 @@ app.whenReady().then(() => {
 
   ipcMain.on('remote-coordinates', (event, coordinates) => {
     let { remoteX, remoteY, eventType } = coordinates;
+    console.log(coordinates)
     if (eventType === 'mousedown') {
       console.log('isMousedown?');
       robot.moveMouse(remoteX, remoteY);
-      robot.mouseToggle("down");
-    } else if (eventType === 'mouseup') {
+      robot.mouseClick("left");
+    } 
+    else if (eventType === 'mouseup') {
       console.log("isMouseUp?");
       robot.dragMouse(remoteX, remoteY);
       robot.mouseToggle("up");
+    }
+    else if (eventType === 'contextmenu') {
+      robot.dragMouse(remoteX, remoteY);
+      robot.mouseClick("right");
     }
   });
 
