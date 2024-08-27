@@ -1,11 +1,12 @@
 import React, { useEffect} from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client";
+import { Button } from "../components/ui/button";
 
 export default function Room() {
   const socket = io("http://3.38.214.160:5004");
   const { id,remoteId } = useParams();
-  console.log(id)
+  
   const navigate = useNavigate();
   const room = `${ remoteId}`;
   console.log("Room ID:", room); // 추가된 로그
@@ -21,6 +22,10 @@ export default function Room() {
   let answer = null;
   let stream = null;
   let source = null;
+  const goBack = ()=>{
+    navigate('/');
+    window.location.reload();
+  }
   useEffect(() => {
     getMedia();
     return () => {
@@ -152,6 +157,7 @@ export default function Room() {
     <div id="box" className="fixed top-0 left-0 w-screen h-screen bg-black">
       <div id="result"></div>
       <video id="myFace" playsInline autoPlay width="600" height="600" className="hidden"></video>
+      <Button onClick={goBack}>돌아가기</Button>
       <video id="peerVideo" playsInline autoPlay width="40%" height="30%" ></video>
     </div>
   );

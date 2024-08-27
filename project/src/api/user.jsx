@@ -29,24 +29,20 @@ function UserData() {
 
   return { data, isLoading, error };
 }
-async function Modify(formData,setLoading) {
-    setLoading(true);
-    try {
-        const response = await axios.put(`${BACK_SERVER}/api/v1/members`, formData , { headers: { Authorization: `Bearer ${token}` }});
-        alert("정보 수정이 완료되었습니다.")
-        return response.data;
-    } 
-    catch (err) {
-      if (err.response.status ===500){
-          alert("올바른 형태의 생년월일을 입력해주세요.");
-      }
-      else if(console.log(err.response.status===422)){
-        alert("몰루")
-      }
+async function Modify(formData) {
+  const token = localStorage.getItem('token');
+  try {
+    const response = await axios.put(`${BACK_SERVER}/api/v1/members`, formData, { headers: { Authorization: `Bearer ${token}` } });
+    return { success: true, message: "정보 수정이 완료되었습니다.", data: response.data };
+  } catch (err) {
+    let message = "An unexpected error occurred.";
+    if (err.response.status === 500) {
+      message = "올바른 형태의 생년월일을 입력해주세요.";
+    } else if (err.response.status === 422) {
+      message = "몰루";
     }
-    finally {
-      setLoading(false);
-    }
+    return { success: false, message };
+  }
 }
 
 export {UserData,Modify};

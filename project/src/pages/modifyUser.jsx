@@ -2,7 +2,17 @@ import React, { useState } from 'react';
 import LoadingIndicator from '../hooks/loading';
 import { Modify } from '../api/user';
 import { useNavigate } from 'react-router-dom';
-
+import { 
+  AlertDialog, 
+  AlertDialogTrigger, 
+  AlertDialogContent, 
+  AlertDialogHeader, 
+  AlertDialogFooter, 
+  AlertDialogTitle, 
+  AlertDialogDescription, 
+  AlertDialogAction, 
+  AlertDialogCancel 
+} from '../components/ui/alert-dialog'; // Adjust the import path accordingly
 
 export default function ModifyUser() {
   const [formData, setFormData] = useState({
@@ -11,7 +21,10 @@ export default function ModifyUser() {
     birth:""
   });
   const [isLoading, setIsLoading] = useState(false);
-  const navigate = useNavigate()
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+  const navigate = useNavigate();
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormData(prevFormData => ({
@@ -22,16 +35,16 @@ export default function ModifyUser() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    try {
-      setIsLoading(true); // 폼 제출 시 로딩 상태를 true로 변경합니다.
-      await Modify(formData,setIsLoading);
+    setIsLoading(true);
+    const result = await Modify(formData);
+    setIsLoading(false);
+    setAlertMessage(result.message);
+    setAlertOpen(true);
+    if (result.success) {
       navigate('/');
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setIsLoading(false); // 로딩 상태를 다시 false로 변경합니다.
     }
   };
+
   return (
     <div className="w-screen h-[70vh] text-center text-2xl">
       <form onSubmit={handleSubmit} className="pt-5 flex flex-col justify-between items-center w-full h-full">
@@ -42,7 +55,7 @@ export default function ModifyUser() {
           name="password"
           value={formData.password}
           onChange={handleInputChange}
-          className="bg-transparent rounded-lg w-1/2 h-8 text-white mb-4 border-2 border-slate-300"
+          className="bg-transparent rounded-lg w-1/2 h-8 text-black mb-4 border-2 border-slate-300"
         />
         <input
           type="text"
@@ -50,7 +63,7 @@ export default function ModifyUser() {
           name="name"
           value={formData.name}
           onChange={handleInputChange}
-          className="bg-transparent rounded-lg w-1/2 h-8 text-white mb-4 border-2 border-slate-300"
+          className="bg-transparent rounded-lg w-1/2 h-8 text-black mb-4 border-2 border-slate-300"
         />
         <input
           type='text'
@@ -59,7 +72,7 @@ export default function ModifyUser() {
           name="birth"
           value={formData.birth}
           onChange={handleInputChange}
-          className="bg-transparent rounded-lg w-1/2 h-8 text-white mb-4 border-2 border-slate-300"
+          className="bg-transparent rounded-lg w-1/2 h-8 text-black mb-4 border-2 border-slate-300"
         />
         <button 
           type="submit" 
@@ -70,6 +83,19 @@ export default function ModifyUser() {
         </button>
       </form>
       {isLoading && <LoadingIndicator />}
+      <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Alert</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogDescription>
+            {alertMessage}
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setAlertOpen(false)}>알겠습니다.</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

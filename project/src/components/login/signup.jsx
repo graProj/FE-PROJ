@@ -1,5 +1,14 @@
 import React, { useState } from "react";
 import signUp from "../../api/signup";
+import { 
+  AlertDialog, 
+  AlertDialogContent, 
+  AlertDialogHeader, 
+  AlertDialogFooter, 
+  AlertDialogTitle, 
+  AlertDialogDescription, 
+  AlertDialogAction 
+} from '../ui/alert-dialog'; // Adjust the import path accordingly
 
 const JoinBox = () => {
   const [formData, setFormData] = useState({
@@ -10,6 +19,9 @@ const JoinBox = () => {
     authority: "USER"
   });
   const [errors, setErrors] = useState({});
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
+
   const handleInputChange = (event) => {
     const { name, value } = event.target;
     setFormData(prevFormData => ({
@@ -24,23 +36,24 @@ const JoinBox = () => {
     try {
       const data = await signUp(formData);
 
-      if(data.success===true){
-        
-      }
-      else if (data.response.errors) {
+      if (data.success === true) {
+        setAlertMessage("회원가입이 성공적으로 완료되었습니다.");
+      } else if (data.response.errors) {
         setErrors(data.response.errors);
-
+        setAlertMessage("회원가입에 실패했습니다. 오류를 확인해주세요.");
       } else {
         setErrors({});
       }
     } catch (error) {
-      // Handle error
+      setAlertMessage("회원가입 중 오류가 발생했습니다. 다시 시도해주세요.");
     }
+    setAlertOpen(true);
   };
+
   return (
-    <div className="text-center"> <h2 className="text-2xl font-bold text-white">회원가입</h2>
+    <div className="text-center">
+      <h2 className="text-2xl font-bold text-white">회원가입</h2>
       <div className="w-full h-5/6 p-1">
-       
         <form onSubmit={handleSubmit} className="flex flex-col justify-center items-center w-full h-full">
           <div className="mb-3 h-[90px]">
             <label htmlFor="email" className="block text-gray-700 text-sm font-medium">이메일</label>
@@ -53,9 +66,7 @@ const JoinBox = () => {
               onChange={handleInputChange}
               className="bg-transparent border border-white rounded-lg w-[400px] h-8 font-light text-xl text-white"
             />
-
           </div>
-
           <div className="mb-3 h-[90px]">
             <label htmlFor="password" className="block text-gray-700 text-sm font-medium">비밀번호</label>
             <input
@@ -72,8 +83,7 @@ const JoinBox = () => {
                 {errors.find(error => error.field === 'password').message}
               </p>
             )}
-            </div>
-
+          </div>
           <div className="mb-3 text-xl h-[90px]">
             <label htmlFor="name" className="block text-gray-700 text-sm font-medium">이름</label>
             <input
@@ -91,7 +101,6 @@ const JoinBox = () => {
               </p>
             )}
           </div>
-
           <div className="mb-3 h-[90px]">
             <label htmlFor="birth" className="block text-gray-700 text-sm font-medium">생년월일</label>
             <input
@@ -110,12 +119,24 @@ const JoinBox = () => {
               </p>
             )}
           </div>
-
           <button type="submit" className="w-48 p-2 border-none rounded-md outline-none cursor-pointer text-white bg-blue-500 transition duration-300 hover:bg-blue-700 focus:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-blue-500">
             회원가입
           </button>
         </form>
       </div>
+      <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Alert</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogDescription>
+            {alertMessage}
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setAlertOpen(false)}>알겠습니다.</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
