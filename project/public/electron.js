@@ -1,18 +1,42 @@
-const { app, BrowserWindow, ipcMain, desktopCapturer } = require('electron/main');
+const { app, BrowserWindow, ipcMain, desktopCapturer, screen } = require('electron/main');
 const path = require('node:path');
+
 const robot = require("@hurdlegroup/robotjs");
+const os = require('os');
+const platform = os.platform();
+
 
 app.whenReady().then(() => {
+  const primaryDisplay = screen.getPrimaryDisplay();
+  const cursorDisplay = screen.getCursorScreenPoint();
+  let width=0;
+  let height=0;
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
+    frame:false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
     },
   });
+  mainWindow.removeMenu()
   // Ensure this path is correct and points to your React app's entry point
   mainWindow.loadURL('http://localhost:3000');
-
+  if (platform === 'win32') {
+    const primaryDisplay = screen.getPrimaryDisplay();
+    width = primaryDisplay.bounds.width*primaryDisplay.scaleFactor;
+    height = primaryDisplay.bounds.height*primaryDisplay.scaleFactor;
+    console.log(width+'awef'+primaryDisplay.scaleFactor)
+  } 
+  else if (platform === 'darwin') {
+    width = primaryDisplay.size.width;
+    height = primaryDisplay.size.height;
+  }
+  ipcMain.on('close', () => {
+    if (mainWindow) {
+      mainWindow.close();
+    }
+  });
   ipcMain.handle('ping', async () => {
     const sources = await desktopCapturer.getSources({ types: ['screen'] });
     // for (const source of sources) {
@@ -31,7 +55,8 @@ app.whenReady().then(() => {
 
   ipcMain.on('remote-coordinates', (event, coordinates) => {
     let { remoteX, remoteY, eventType } = coordinates;
-    console.log(coordinates)
+    remoteX = remoteX *(width/1000);
+    remoteY = remoteY *(height/562);
     if (eventType === 'mousedown') {
       console.log('isMousedown?');
       robot.moveMouse(remoteX, remoteY);
