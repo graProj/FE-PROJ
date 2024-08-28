@@ -10,9 +10,6 @@ import { CursorArrowIcon, EnterIcon, MagnifyingGlassIcon, PersonIcon } from '@ra
 
 export default function Home() {
   const { data } = UserData();
-  const refreshToken = localStorage.getItem("rtk");
-
-  console.log(refreshToken)
   return (
     <div className="w-screen z-100 flex">
       <div className="w-1/5 h-full flex flex-col items-center border-r border-[#ececec]">
