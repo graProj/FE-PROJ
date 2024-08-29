@@ -5,7 +5,7 @@ import { Button } from "../components/ui/button";
 
 export default function Room() {
   const socket = io("http://3.38.214.160:5004");
-  const { id,remoteId } = useParams();
+  const { remoteId } = useParams();
   
   const navigate = useNavigate();
   const room = `${ remoteId}`;
@@ -153,7 +153,6 @@ export default function Room() {
         navigate(-1);
       })
       socket.on('disconnect', () => {
-        window.location.reload();
       });
 
     // 시작부터 연결이 안될 경우
@@ -167,7 +166,7 @@ export default function Room() {
 
 
   return (
-    <div id="box" className="fixed top-0 left-0 w-screen h-screen bg-black">
+    <div id="box" className="relative bottom-0 left-0 w-screen h-screen bg-black">
       <div id="result"></div>
       <video id="myFace" playsInline autoPlay width="600" height="600" className="hidden"></video>
       <Button onClick={goBack}>돌아가기</Button>

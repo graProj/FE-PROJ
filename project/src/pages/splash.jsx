@@ -6,14 +6,12 @@ import { Button } from '@radix-ui/themes';
 import { signIn } from '../api/login'; // Import the signIn function
 import { 
   AlertDialog, 
-  AlertDialogTrigger, 
   AlertDialogContent, 
   AlertDialogHeader, 
   AlertDialogFooter, 
   AlertDialogTitle, 
   AlertDialogDescription, 
   AlertDialogAction, 
-  AlertDialogCancel 
 } from '../components/ui/alert-dialog'; // Adjust the import path accordingly
 
 export default function Splash() {
@@ -52,7 +50,7 @@ export default function Splash() {
     const interval = setInterval(checkTokenValidity, 1000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, [navigate]);
 
 
   const changeShow = () => {
@@ -71,7 +69,7 @@ export default function Splash() {
   
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-black flex flex-col justify-center items-center">
+    <div className="relative bottom-0  w-full h-screen bg-black flex flex-col justify-center items-center">
       <div className="w-1/2 h-full text-white text-2xl font-bold text-center flex flex-col items-center justify-center ">
         {
           loginShow ? <Form onSubmit={handleSignIn} /> : <JoinBox />
@@ -85,18 +83,18 @@ export default function Splash() {
         <h4 className='text-gray-600'>학생 전용입니다.</h4>
       </div>
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>
-  <AlertDialogContent>
-    <AlertDialogHeader>
-      <AlertDialogTitle>Alert</AlertDialogTitle>
-    </AlertDialogHeader>
-    <AlertDialogDescription>
-      {alertMessage}
-    </AlertDialogDescription>
-    <AlertDialogFooter>
-      <AlertDialogAction onClick={() => setAlertOpen(false)}>알겠습니다.</AlertDialogAction>
-    </AlertDialogFooter>
-  </AlertDialogContent>
-</AlertDialog>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Alert</AlertDialogTitle>
+          </AlertDialogHeader>
+          <AlertDialogDescription>
+            {alertMessage}
+          </AlertDialogDescription>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setAlertOpen(false)}>알겠습니다.</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }

@@ -1,6 +1,6 @@
 // ProtectedRoutes.js
 
-import { Outlet, useNavigate } from "react-router-dom";
+import { Outlet, useNavigate, useLocation } from "react-router-dom"; // Added useLocation
 import '../index.css';
 import Header from "../components/header";
 import { useEffect, useState } from "react";
@@ -11,8 +11,9 @@ const ProtectedRoutes = () => {
   const refreshToken = localStorage.getItem("rtk");
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const location = useLocation(); // Added useLocation
+
   useEffect(() => {
-    
     const checkTokenValidity = async () => {
       if (refreshToken) {
         try {
@@ -20,8 +21,7 @@ const ProtectedRoutes = () => {
           const milliseconds = Info.exp * 1000;
           const date = new Date(milliseconds);
           const currentTime = new Date();
-          // 토큰 만료 5분 전에만 재발급 시도
-          if ( date < currentTime ) {
+          if (date < currentTime) {
             localStorage.removeItem('token');
             localStorage.removeItem('rtk');
             navigate('/auth');
@@ -38,6 +38,7 @@ const ProtectedRoutes = () => {
 
     return () => clearInterval(interval);
   }, []);
+
   useEffect(() => {
     const checkTokenValidity = async () => {
       if (localStorageToken) {
@@ -46,7 +47,6 @@ const ProtectedRoutes = () => {
           const milliseconds = Info.exp * 1000;
           const date = new Date(milliseconds);
           const currentTime = new Date();
-          // 토큰 만료 5분 전에만 재발급 시도
           if (date - currentTime < 5 * 60 * 1000) {
             await refreshTokenIfNeeded();
           }
@@ -55,8 +55,7 @@ const ProtectedRoutes = () => {
           localStorage.removeItem('rtk');
           navigate('/auth');
         }
-      }
-       else {
+      } else {
         navigate('/auth');
       }
       setIsLoading(false); 
@@ -67,7 +66,7 @@ const ProtectedRoutes = () => {
     const interval = setInterval(checkTokenValidity, 300*1000);
 
     return () => clearInterval(interval);
-  }, [localStorageToken,navigate]); // Added missing dependencies
+  }, [localStorageToken, navigate]);
 
   if (isLoading) {
     return <div>Loading...</div>;
@@ -75,7 +74,7 @@ const ProtectedRoutes = () => {
 
   return (
     <>
-      <Header />
+      {!/^\/home\/room\/.*$/.test(location.pathname) && <Header />}
       <Outlet />
     </>
   );

@@ -4,36 +4,36 @@ import axios from 'axios';
 
 const token = localStorage.getItem('token');
 const BACK_SERVER = process.env.REACT_APP_BACK_SERVER;
+let message;
+const PostData = () => {
+    const queryClient = useQueryClient();
+    const mutation = useMutation({
+        mutationFn: async (lectureId) => {
+            const {data} = await axios.post(`${BACK_SERVER}/api/v1/enrollment`, { lectureId }, { headers: { Authorization: `Bearer ${token}` }});
+        
+            return { data, message: "강의신청이 완료되었습니다." };
+        },
+        onSuccess: async (variables) => {
+            queryClient.invalidateQueries(['requestLecture', variables]);
+        },
+    });
 
-async function postData(lectureId) {
-    try {
-        const response = await axios.post(`${BACK_SERVER}/api/v1/enrollment`, { lectureId }, { headers: { Authorization: `Bearer ${token}` }});
-        alert("강의 신청이 완료되었습니다.");
-        return response.data;
-    } catch (err) {
-        if (err.response.status === 404) {
-            alert("해당 강의를 찾을 수 없습니다.");
-        } else if (err.response.status === 409) {
-            alert("이미 교수자에게 강의 등록 요청을 보냈습니다");
-        }
-    }
-}
-
+    return mutation;
+};
 const CancelData = () => {
     const queryClient = useQueryClient();
     const mutation = useMutation({
-        mutationFn: (enrollmentId) => {
-            console.log(enrollmentId);
-            return axios.delete(`${BACK_SERVER}/api/v1/enrollment?enrollmentId=${enrollmentId}`, {
+        mutationFn: async (enrollmentId) => {
+            const { data } = await axios.delete(`${BACK_SERVER}/api/v1/enrollment?enrollmentId=${enrollmentId}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
+            return { data, message: "취소가 완료되었습니다." };
         },
-        onSuccess: async () => {
-            console.log("삭제가 완료되었습니다.");
-            queryClient.invalidateQueries('requestLecture');
+        onSuccess: async (variables) => {
+            queryClient.refetchQueries('requestLecture',variables);
         },
         onError: (error, variables, context) => {
-            console.log("what?");
+            console.error('취소 중 오류 발생:', error);
         },
     });
 
@@ -44,21 +44,19 @@ const DeleteData = () => {
     const queryClient = useQueryClient();
     const mutation = useMutation({
         mutationFn: (lectureId) => {
-            console.log("first", lectureId);
             return axios.delete(`${BACK_SERVER}/api/v1/lecture-member/member?lectureId=${lectureId.lecid}&memberId=${lectureId.memid}`, {
                 headers: { Authorization: `Bearer ${token}` },
             });
         },
         onSuccess: async () => {
-            alert("삭제가 완료되었습니다.");
             queryClient.invalidateQueries('requestLecture');
         },
         onError: (error, variables, context) => {
-            console.log("what?");
+            console.log(error.response.status)
         },
     });
 
     return mutation;
 };
 
-export { postData, DeleteData, CancelData };
+export { PostData, DeleteData, CancelData };
