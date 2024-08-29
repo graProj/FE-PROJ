@@ -26,10 +26,6 @@ const router = createHashRouter([
         element: <LectureInfo />
       },
       {
-        path: 'home/remoteinfo',
-        element: <RemoteInfo />
-      },
-      {
         path: 'home/room/:remoteId',
         element: <Room />
       },

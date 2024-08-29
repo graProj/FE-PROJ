@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React  from 'react';
 import { TrashIcon } from 'lucide-react';
 
 import { UserData } from '../api/user';
 import RequestBox from '../components/lecture/requestBox';
 import { BentoCard, BentoGrid } from '../components/ui/bentoGrid';
 
-import { CursorArrowIcon, EnterIcon, MagnifyingGlassIcon, PersonIcon } from '@radix-ui/react-icons';
+import { EnterIcon, MagnifyingGlassIcon, PersonIcon } from '@radix-ui/react-icons';
 
 
 export default function Home() {
@@ -31,7 +31,7 @@ export default function Home() {
               href="/home/lectureinfo"
               cta="ENTER"
 
-              className='md:row-start-1 md:row-end-4 md:col-start-2 md:col-end-3'
+              className='md:row-start-3 md:row-end-4 md:col-start-2 md:col-end-3'
             />
             <BentoCard
               name="정보 수정"
@@ -49,21 +49,14 @@ export default function Home() {
               cta="ENTER"
               className= "md:col-start-1 md:col-end-2 md:row-start-3 md:row-end-4"
             />
-            <BentoCard
-              name="원격실"
-              Icon={CursorArrowIcon}
-              description="교수님께 맡겨요"
-              href="/home/remoteinfo"
-              cta="ENTER"
-              className= "md:col-start-3 md:col-end-3 md:row-start-1 md:row-end-2"
-            />
+            
             <BentoCard
               name="강의 찾기"
               Icon={MagnifyingGlassIcon}
               description=""
               href="/home/search"
               cta="ENTER"
-              className= "md:col-start-3 md:col-end-3 md:row-start-2 md:row-end-4"
+              className= "md:col-start-2 md:col-end-3 md:row-start-1 md:row-end-3"
             />
 
           </BentoGrid>

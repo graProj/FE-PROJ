@@ -10,7 +10,8 @@ function Lecture() {
   const { data, isLoading, error  } = useLectureData();
   const mutation = DeleteData();
   const [searchText, setSearchText] = useState('');
-
+  const [alertOpen, setAlertOpen] = useState(false);
+  const [alertMessage, setAlertMessage] = useState('');
   const filteredBoxes = useMemo(() => {
     return data ? data.filter(box => box.lecture.title.toLowerCase().includes(searchText.toLowerCase())) : [];
   }, [data, searchText]);
@@ -20,14 +21,11 @@ function Lecture() {
   };
 
   const onDeleteHandler = async(title,lecid,memid) =>{
-    const isDelete= window.confirm(`${title} 삭제하시겠습니까?`);
-    if(isDelete){
       try {
         await mutation.mutateAsync({lecid,memid});
       } catch (error) {
         console.error('취소 중 오류 발생:', error);
       }
-    }
     
   }
   return (
@@ -55,6 +53,7 @@ function Lecture() {
         </div>
         
       ):(<div>Didacto 학생 전용입니다..!</div>)}
+      
     </div>
   )
 }

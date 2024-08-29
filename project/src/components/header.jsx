@@ -15,9 +15,6 @@ export default function Header() {
     navigate('/')
     window.location.reload();
   }
-  const close = ()=>{
-    window.setting.close();
-  }
   return (
     <>
       <div className={`h-12 flex justify-between px-4 items-center border-b-2 `}>
@@ -26,7 +23,6 @@ export default function Header() {
         </div>
         <div className="w-2/5 h-full flex items-center justify-end">
           <Button onClick={logout}>로그아웃</Button>
-          <Button onClick={close}>종료</Button>
         </div>
       </div>
     </>

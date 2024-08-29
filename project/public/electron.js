@@ -8,7 +8,6 @@ const platform = os.platform();
 
 app.whenReady().then(() => {
   const primaryDisplay = screen.getPrimaryDisplay();
-  const cursorDisplay = screen.getCursorScreenPoint();
   let width=0;
   let height=0;
   mainWindow = new BrowserWindow({
@@ -17,6 +16,8 @@ app.whenReady().then(() => {
     frame:false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
+      nodeIntegration: true, // 추가
+      contextIsolation: false
     },
   });
   mainWindow.removeMenu()
@@ -37,6 +38,27 @@ app.whenReady().then(() => {
       mainWindow.close();
     }
   });
+  ipcMain.on('start-drag', (event, initialPosition) => {
+    const { x: startX, y: startY } = initialPosition;
+    const currentWindow = BrowserWindow.fromWebContents(event.sender);
+  
+    const moveListener = (moveEvent) => {
+      const { screenX, screenY } = moveEvent;
+      const offsetX = screenX - startX;
+      const offsetY = screenY - startY;
+  
+      const [currentX, currentY] = currentWindow.getPosition();
+      currentWindow.setPosition(currentX + offsetX, currentY + offsetY);
+    };
+  
+    const stopListener = () => {
+      currentWindow.removeListener('mousemove', moveListener);
+      currentWindow.removeListener('mouseup', stopListener);
+    };
+  
+    currentWindow.on('mousemove', moveListener);
+    currentWindow.on('mouseup', stopListener);
+  });
   ipcMain.handle('ping', async () => {
     const sources = await desktopCapturer.getSources({ types: ['screen'] });
     // for (const source of sources) {
@@ -55,8 +77,8 @@ app.whenReady().then(() => {
 
   ipcMain.on('remote-coordinates', (event, coordinates) => {
     let { remoteX, remoteY, eventType } = coordinates;
-    remoteX = remoteX *(width/1000);
-    remoteY = remoteY *(height/562);
+    remoteX = remoteX *(width/1536);
+    remoteY = remoteY *(height/864);
     if (eventType === 'mousedown') {
       console.log('isMousedown?');
       robot.moveMouse(remoteX, remoteY);
@@ -68,11 +90,10 @@ app.whenReady().then(() => {
       robot.mouseToggle("up");
     }
     else if (eventType === 'contextmenu') {
-      robot.dragMouse(remoteX, remoteY);
       robot.mouseClick("right");
+      robot.dragMouse(remoteX, remoteY);
     }
   });
-
   ipcMain.on('remote-keyPress', (event, String) => {
     let pressedKey = String.toLowerCase();
     let askiiStr = pressedKey.charCodeAt(0);

@@ -25,6 +25,7 @@ function RequestLecture() {
         
       },
       staleTime:30000,
+      refetchOnWindowFocus: true,
     });
   
     return { data, isLoading, error,refetch };

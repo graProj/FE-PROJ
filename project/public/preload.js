@@ -1,6 +1,17 @@
 const { contextBridge} = require('electron');
 const { ipcRenderer } = require('electron/renderer');
 
+window.addEventListener('DOMContentLoaded', () => {
+  const dragElement = document.querySelector('.draggable');
+  const closeElement = document.querySelector('.close-window');
+  dragElement.addEventListener('mousedown', (event) => {
+    ipcRenderer.send('start-drag', { x: event.screenX, y: event.screenY });
+  });
+  closeElement.addEventListener('click', () => {
+    ipcRenderer.send('close')
+  });
+  
+});
 contextBridge.exposeInMainWorld('electron', {
   openNewWindow: (relativeUrl) => ipcRenderer.send('open-new-window', relativeUrl),
 });
@@ -29,7 +40,3 @@ contextBridge.exposeInMainWorld('remote', {
     ipcRenderer.send('remote-keyPress', pressedKey); //ressedKey를 직접 인자로 전달
   }
 });
-contextBridge.exposeInMainWorld('setting', {
-  close:()=>{ipcRenderer.send('close')}
-   
-})
