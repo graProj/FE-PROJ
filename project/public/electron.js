@@ -14,15 +14,15 @@ app.whenReady().then(() => {
     width: 800,
     height: 600,
     frame:false,
+    resizable:false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true, // 추가
-      contextIsolation: false
     },
   });
-  mainWindow.removeMenu()
+  mainWindow.removeMenu();
   // Ensure this path is correct and points to your React app's entry point
-  mainWindow.loadURL('http://localhost:3000');
+  mainWindow.loadFile(path.join(__dirname, '../build/index.html'));
   if (platform === 'win32') {
     const primaryDisplay = screen.getPrimaryDisplay();
     width = primaryDisplay.bounds.width*primaryDisplay.scaleFactor;
@@ -38,6 +38,29 @@ app.whenReady().then(() => {
       mainWindow.close();
     }
   });
+  ipcMain.on('resize', () => {
+    mainWindow.setResizable(true);
+    mainWindow.setSize(300,300);
+    mainWindow.setResizable(false);
+  })
+  ipcMain.on('default', () => {
+    mainWindow.setResizable(true);
+    mainWindow.setSize(800,600);
+    mainWindow.setResizable(false);
+
+  })
+  ipcMain.handle('ping', async () => {
+    const sources = await desktopCapturer.getSources({ types: ['screen'] });
+    // for (const source of sources) {
+    //   console.log(source)
+    //   if (source.id === 'screen:0:0') {
+    //     console.log(source.id)
+    //     return source.id;
+    //   }
+    // }
+    console.log(sources[0])
+    return sources[0].id;
+});
   ipcMain.on('start-drag', (event, initialPosition) => {
     const { x: startX, y: startY } = initialPosition;
     const currentWindow = BrowserWindow.fromWebContents(event.sender);
@@ -59,39 +82,35 @@ app.whenReady().then(() => {
     currentWindow.on('mousemove', moveListener);
     currentWindow.on('mouseup', stopListener);
   });
-  ipcMain.handle('ping', async () => {
-    const sources = await desktopCapturer.getSources({ types: ['screen'] });
-    // for (const source of sources) {
-    //   console.log(source)
-    //   if (source.id === 'screen:0:0') {
-    //     console.log(source.id)
-    //     return source.id;
-    //   }
-    // }
-    return sources[0].id;
-});
+  
 
   mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
     console.error('Failed to load:', errorDescription);
   });
 
-  ipcMain.on('remote-coordinates', (event, coordinates) => {
+   ipcMain.on('remote-coordinates', (event, coordinates) => {
     let { remoteX, remoteY, eventType } = coordinates;
     remoteX = remoteX *(width/1536);
     remoteY = remoteY *(height/864);
+    
     if (eventType === 'mousedown') {
       console.log('isMousedown?');
-      robot.moveMouse(remoteX, remoteY);
-      robot.mouseClick("left");
-    } 
+      // await robot.moveMouse(remoteX, remoteY);
+      // robot.mouseClick("left");
+      robot.mouseToggle("down", "left");
+    }
     else if (eventType === 'mouseup') {
       console.log("isMouseUp?");
-      robot.dragMouse(remoteX, remoteY);
-      robot.mouseToggle("up");
+      // robot.dragMouse(remoteX, remoteY);
+      // robot.mouseToggle("up");
+      robot.mouseToggle("up", "left");
     }
+    else if (eventType === 'mousemove') {
+      robot.moveMouseSmooth(remoteX, remoteY);
+    } 
     else if (eventType === 'contextmenu') {
-      robot.mouseClick("right");
       robot.dragMouse(remoteX, remoteY);
+      robot.mouseClick("right");
     }
   });
   ipcMain.on('remote-keyPress', (event, String) => {

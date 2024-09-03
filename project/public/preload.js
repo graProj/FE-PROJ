@@ -1,4 +1,4 @@
-const { contextBridge} = require('electron');
+const { contextBridge } = require('electron');
 const { ipcRenderer } = require('electron/renderer');
 
 window.addEventListener('DOMContentLoaded', () => {
@@ -12,14 +12,20 @@ window.addEventListener('DOMContentLoaded', () => {
   });
   
 });
-contextBridge.exposeInMainWorld('electron', {
-  openNewWindow: (relativeUrl) => ipcRenderer.send('open-new-window', relativeUrl),
-});
+
 contextBridge.exposeInMainWorld('display', {
   source: async () => { 
     const sourceId = await ipcRenderer.invoke('ping'); 
     console.log("sourceId:", sourceId);
     return sourceId;
+  },
+  resize : () => {
+    console.log("실행함?")
+    ipcRenderer.send('resize')
+  },
+  default : () => {
+    console.log("실행함?")
+    ipcRenderer.send('default')
   },
   image: async () => {
     const source = ipcRenderer.sendSync('image');

@@ -8,12 +8,12 @@ function LectureRoom() {
     const Info = JSON.parse(atob(localStorage.getItem("token").split('.')[1]));
     const userId = Info.Id;
 
-    setInterval(async () => {
-      console.log("lectureRoom");
-      let source = await window.display.image();
-      sendImage(roomId, source);
-      console.log(source);
-    }, 10000);
+    // setInterval(async () => {
+    //   console.log("lectureRoom");
+    //   let source = await window.display.image();
+    //   sendImage(roomId, source);
+    //   console.log(source);
+    // }, 10000);
     useEffect(() => {
       navigate(`/home/room/L${roomId}M${userId}`);
     }, []);
