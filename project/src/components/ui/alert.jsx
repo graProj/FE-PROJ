@@ -19,7 +19,7 @@ import { Button } from "./button"
     return (
       <AlertDialog>
         <AlertDialogTrigger asChild>
-          <Button variant="ghost">{showicon}</Button>
+          <button className="w-full">{showicon}</button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>

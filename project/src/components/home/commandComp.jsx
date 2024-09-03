@@ -1,11 +1,9 @@
-import { useState, useEffect } from "react";
-
+import { useState } from "react";
 
 import {
   Command,
   CommandEmpty,
   CommandGroup,
-  CommandInput,
   CommandItem,
   CommandList,
   CommandSeparator,
@@ -23,67 +21,62 @@ import {
   AlertDialogDescription, 
   AlertDialogAction, 
  } from "../ui/alert-dialog";
+import useDebounce from "../../hooks/Debounce";
+import { Search } from "lucide-react";
+import { Alert } from "../ui/alert";
+
 
 
 
 export function CommandComp() {
   const [searchText, setSearchText] = useState('');
-  const [filteredData, setFilteredData] = useState([]);
-  const [allData, setAllData] = useState([]); // 모든 페이지의 데이터를 저장할 상태 추가
+  const debouncedText = useDebounce(searchText,700);
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-  const { data, isLoading, error } = useSearchData(searchText); // Use the custom hook
+  const { data, isLoading } = useSearchData(debouncedText); // Use the custom hook
   const mutation = PostData();
-  useEffect(() => {
-    if (data) {
-      setAllData(data);
-    }
-  }, [data]);
-
-  useEffect(() => {
-    if (allData) {
-      const filtered = allData.filter(item =>
-        item.title.toLowerCase().includes(searchText.toLowerCase())
-      );
-      setFilteredData(filtered);
-    }
-  }, [searchText, allData]);
-
-  const onSubmitHandler = async (title, id) => {
-    const isEnrolled = window.confirm(`${title} 신청하시겠습니까?`);
-    if (isEnrolled) {
+  const onChangeHandler = (e) => {
+    setSearchText(e.target.value)
+    
+  };
+  const onSubmitHandler = async (id) => {
         try {
             const result = await mutation.mutateAsync(id);
             setAlertMessage(result.message); // Set the alert message
             setAlertOpen(true);
         } catch (err) {
-          console.log(err.response.data.message)
             setAlertMessage(err.response.data.message)
             setAlertOpen(true);
         }
-    }
-};
+    
+  };
 
   return (
     <Command className="rounded-lg border shadow-md">
-      <CommandInput
-        placeholder="강의를 검색하세요."
-      />
+      <div className="flex items-center border-b px-3" cmdk-input-wrapper="">
+        <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+        <input className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none placeholder:text-slate-500 disabled:cursor-not-allowed disabled:opacity-50 dark:placeholder:text-slate-400" type="text" value={searchText} onChange={onChangeHandler} />
+      </div>
+      
       <CommandList>
         <CommandEmpty>No results found.</CommandEmpty>
         <CommandGroup heading="Lectures">
           {isLoading ? (
             <div>Loading...</div>
           ) : (
-            filteredData.map((box, index) => (
-              <div className="" key={index}>
+            data && data.map((box, index) => (
+              <div className="w-full" key={index}>
                 {box.title && (
-                  <Button className="w-full" onClick={() => onSubmitHandler(box.title, box.id)}>
-                  <CommandItem className="w-full justify-between flex" >
+                  <Alert className="w-full" showicon={
+                    <CommandItem className="w-full justify-between flex" >
                     <span>{box.title}</span>
                     <span>강의자: {box.owner.name}</span>
-                  </CommandItem>
-                  </Button>
+                    </CommandItem>
+                  } 
+                  title={`${box.title} 강의에 참여 신청하시겠습니까?`}
+                  enter={() => onSubmitHandler(box.id)}>
+                  
+                  </Alert>
                 )}
               </div>
             ))

@@ -10,8 +10,6 @@ function Lecture() {
   const { data, isLoading, error  } = useLectureData();
   const mutation = DeleteData();
   const [searchText, setSearchText] = useState('');
-  const [alertOpen, setAlertOpen] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
   const filteredBoxes = useMemo(() => {
     return data ? data.filter(box => box.lecture.title.toLowerCase().includes(searchText.toLowerCase())) : [];
   }, [data, searchText]);

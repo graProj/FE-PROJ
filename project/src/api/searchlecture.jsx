@@ -6,7 +6,6 @@ async function fetchAllPages(searchText) {
   let page = 1;
   let allResults = [];
   let hasMore = true;
-
   while (hasMore) {
     const params = {
       page,
@@ -33,6 +32,7 @@ function useSearchData(searchText) {
   const { data, isLoading, error } = useQuery({
     queryKey: ['lectureData', searchText],
     queryFn: () => fetchAllPages(searchText),
+    staleTime:3600*1000,
   });
 
   return { data, isLoading, error };
