@@ -1,4 +1,4 @@
-import React, { useEffect} from "react";
+import React, { useEffect, useRef} from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { io } from "socket.io-client";
 import { Button } from "../components/ui/button";
@@ -16,7 +16,12 @@ export default function Room() {
       },
     ],
   };
-  
+  const resizeExecuted = useRef(false);
+
+  if (!resizeExecuted.current) {
+    window.display.resize();
+    resizeExecuted.current = true;
+  }
   let myPeerConnection = new RTCPeerConnection(configuration);
 
   let offer = null;
@@ -26,9 +31,11 @@ export default function Room() {
   let peerVideo = null;
   const goBack = ()=>{
     navigate('/');
+    window.display.default();
     window.location.reload();
   }
   useEffect(() => {
+    
     getMedia();
     myPeerConnection.addEventListener("iceconnectionstatechange", handleConnectionStateChange);
     return () => {
@@ -47,6 +54,7 @@ export default function Room() {
   myPeerConnection.addEventListener("addstream", handleAddStream);
 
   myPeerConnection.onicecandidate = function(event) {
+    
     console.log("Send Candidate");
     Send({
         event: "candidate",
@@ -60,7 +68,7 @@ export default function Room() {
     peerVideo.srcObject = data.stream;
   }
   if (myPeerConnection.iceConnectionState === "disconnected" && peerVideo.srcObject!==null) {
-
+    window.location.reload();
     peerVideo.srcObject=null
   }
   async function Send(message) {
@@ -89,6 +97,7 @@ export default function Room() {
           console.log("Receive Offer", content.data);
           offer = content.data;
           await myPeerConnection.setRemoteDescription(offer);
+          console.log("source : ",source)
           if (!source) {
             source = await window.display.source();
           }
@@ -170,7 +179,7 @@ export default function Room() {
       <div id="result"></div>
       <video id="myFace" playsInline autoPlay width="600" height="600" className="hidden"></video>
       <Button onClick={goBack}>돌아가기</Button>
-      <video id="peerVideo" playsInline autoPlay width="40%" height="30%" ></video>
+      <video id="peerVideo" playsInline autoPlay width="200" height="200" ></video>
     </div>
   );
 }
