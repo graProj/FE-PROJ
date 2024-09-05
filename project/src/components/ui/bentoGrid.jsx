@@ -34,10 +34,9 @@ const BentoCard = ({
     href,
     cta,
   }) => {
-  const navigate = useNavigate();
 
   const linkHandler = (ref) => {
-    navigate(ref);
+    window.location.hash = `${ref}`
   }
  return (
     

@@ -24,7 +24,7 @@ function UserData() {
       });
       return response.data.response;
     },
-    staleTime: 2000000,
+    staleTime: 20000,
   });
 
   return { data, isLoading, error };
