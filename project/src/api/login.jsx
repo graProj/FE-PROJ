@@ -1,3 +1,4 @@
+
 const BACK_SERVER = process.env.REACT_APP_BACK_SERVER;
 const signIn = async (formData, setLoading) => {
   try {
@@ -60,7 +61,7 @@ const refreshTokenIfNeeded = async () => {
       else{
         localStorage.removeItem('token');
         localStorage.removeItem('rtk');
-        window.location.reload();
+        window.location.hash = '/auth'
       }
     } catch (error) {
       console.log('what')

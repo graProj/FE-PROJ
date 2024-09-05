@@ -33,12 +33,18 @@ const ProtectedRoutes = () => {
       }
       if (localStorageToken) {
         try {
+          
           const Info = JSON.parse(atob(localStorageToken.split('.')[1]));
-          console.log("세부사항")
+          
+          
           const milliseconds = Info.exp * 1000;
           const date = new Date(milliseconds);
+          console.log(date)
           const currentTime = new Date();
+          console.log(currentTime)
           if (date - currentTime < 60 * 1000) {
+            console.log(date - currentTime)
+            console.log("세부사항")
             await refreshTokenIfNeeded();
           }
         } catch (error) {
