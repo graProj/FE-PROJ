@@ -48,7 +48,7 @@ export default function Room() {
   function handleConnectionStateChange() {
     if (myPeerConnection.iceConnectionState === "disconnected" && peerVideo!==null) {
       console.log("Peer connection lost. Reloading page.");
-      peerVideo.srcObject=null
+      window.location.reload();
     }
   }
   myPeerConnection.addEventListener("addstream", handleAddStream);

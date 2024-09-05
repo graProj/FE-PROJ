@@ -51,14 +51,7 @@ app.whenReady().then(() => {
   })
   ipcMain.handle('ping', async () => {
     const sources = await desktopCapturer.getSources({ types: ['screen'] });
-    // for (const source of sources) {
-    //   console.log(source)
-    //   if (source.id === 'screen:0:0') {
-    //     console.log(source.id)
-    //     return source.id;
-    //   }
-    // }
-    console.log(sources[0])
+    console.log(sources)
     return sources[0].id;
 });
   ipcMain.on('start-drag', (event, initialPosition) => {
@@ -106,7 +99,7 @@ app.whenReady().then(() => {
       robot.mouseToggle("up", "left");
     }
     else if (eventType === 'mousemove') {
-      robot.moveMouseSmooth(remoteX, remoteY);
+      robot.moveMouseSmooth(remoteX, remoteY,1);
     } 
     else if (eventType === 'contextmenu') {
       robot.dragMouse(remoteX, remoteY);
