@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+
 const BACK_SERVER = process.env.REACT_APP_BACK_SERVER;
 
 async function fetchAllPages(searchText) {

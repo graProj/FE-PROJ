@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { refreshTokenIfNeeded } from './login';
 const BACK_SERVER = process.env.REACT_APP_BACK_SERVER;
 function RequestLecture() {
-    const token = localStorage.getItem('token');
+    
     const { data, isLoading, error,refetch } = useQuery({
       queryKey: ['requestLecture'],
       queryFn: async () => {
+        const token = await refreshTokenIfNeeded();
         try {
           const params = {
             statuses: 'WAITING',

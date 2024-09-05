@@ -15,14 +15,14 @@ import {
   AlertDialogAction,  
 } from '../ui/alert-dialog';
 
+
 export default function RequestBox() {
   const { data, isLoading, error } = useRequestLecture();
   const mutation = CancelData();
   const [alertOpen, setAlertOpen] = useState(false);
   const [alertMessage, setAlertMessage] = useState('');
-  const onSubmitHandler = async (title , id) => {
-    const isCanceled = window.confirm(`${title} 취소하시겠습니까?`);
-    if (isCanceled) {
+  const onSubmitHandler = async (id) => {
+
       try {
         const result = await mutation.mutateAsync(id);
         setAlertMessage(result.message); // Use the returned message
@@ -30,7 +30,7 @@ export default function RequestBox() {
       } catch (err) {
         console.log(err.response.status)
       }
-    }
+
   };
 
   return (
@@ -42,7 +42,7 @@ export default function RequestBox() {
         <div key={index} className="w-full max-h-[25%] border-b border-gray-400 flex flex-col justify-center items-center">
           <p>{enrollment.status}</p>
           <p>{enrollment.lecture.title}</p> <p> {enrollment.lecture.owner.name}</p>
-          <Button className='flex' onClick={()=>onSubmitHandler(enrollment.lecture.title, enrollment.id)}>취소<EraserIcon/></Button>
+          <Button className='flex' onClick={()=>onSubmitHandler(enrollment.id)}>취소<EraserIcon/></Button>
         </div>
       )))}
       <AlertDialog open={alertOpen} onOpenChange={setAlertOpen}>

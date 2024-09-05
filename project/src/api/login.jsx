@@ -35,28 +35,38 @@ const signIn = async (formData, setLoading) => {
 
 const refreshTokenIfNeeded = async () => {
   const rtk = localStorage.getItem('rtk');
+  let localStorageToken = localStorage.getItem('token');
+  const Info = JSON.parse(atob(localStorageToken.split('.')[1]));
+  const milliseconds = Info.exp * 1000;
+  const date = new Date(milliseconds);
+  const currentTime = new Date();
+  if (date - currentTime < 60 * 1000) {
+    try {
+      const response = await fetch(`${BACK_SERVER}/api/v1/auth/refresh`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${rtk}`
+        },
+      });
 
-  try {
-    const response = await fetch(`${BACK_SERVER}/api/v1/auth/refresh`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${rtk}`
-      },
-    });
-
-    const data = await response.json();
-    if (response.status===200) {
-      localStorage.setItem('token', data.response.accessToken);
+      const data = await response.json();
+      if (response.status===200) {
+        localStorage.setItem('token', data.response.accessToken);
+        localStorageToken = localStorage.getItem('token');
+        return localStorageToken;
+      }
+      
+      else{
+        localStorage.removeItem('token');
+        localStorage.removeItem('rtk');
+        window.location.reload();
+      }
+    } catch (error) {
+      console.log('what')
     }
-    else{
-      localStorage.removeItem('token');
-      localStorage.removeItem('rtk');
-    }
-  } catch (error) {
-    console.log('what')
   }
-  
+  else return localStorageToken;
 };
 
 export { signIn, refreshTokenIfNeeded };
