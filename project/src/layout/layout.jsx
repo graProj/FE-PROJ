@@ -15,8 +15,10 @@ const ProtectedRoutes = () => {
 
   useEffect(() => {
     const checkTokenValidity = async () => {
+      console.log("실행?")
       if (refreshToken) {
         try {
+          
           const Info = JSON.parse(atob(refreshToken.split('.')[1]));
           const milliseconds = Info.exp * 1000;
           const date = new Date(milliseconds);
@@ -29,25 +31,14 @@ const ProtectedRoutes = () => {
         } catch (error) {
         }
       }
-      setIsLoading(false); 
-    };
-
-    checkTokenValidity(); 
-
-    const interval = setInterval(checkTokenValidity, 300*1000);
-
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    const checkTokenValidity = async () => {
       if (localStorageToken) {
         try {
           const Info = JSON.parse(atob(localStorageToken.split('.')[1]));
+          console.log("세부사항")
           const milliseconds = Info.exp * 1000;
           const date = new Date(milliseconds);
           const currentTime = new Date();
-          if (date - currentTime < 5 * 60 * 1000) {
+          if (date - currentTime < 60 * 1000) {
             await refreshTokenIfNeeded();
           }
         } catch (error) {
@@ -63,10 +54,7 @@ const ProtectedRoutes = () => {
 
     checkTokenValidity(); 
 
-    const interval = setInterval(checkTokenValidity, 300*1000);
-
-    return () => clearInterval(interval);
-  }, [localStorageToken, navigate]);
+  }, [localStorageToken, refreshToken,navigate]);
 
   if (isLoading) {
     return <div>Loading...</div>;

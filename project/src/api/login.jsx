@@ -49,10 +49,9 @@ const refreshTokenIfNeeded = async () => {
     if (response.status===200) {
       localStorage.setItem('token', data.response.accessToken);
     }
-    if (response.status===403) {
+    else{
       localStorage.removeItem('token');
       localStorage.removeItem('rtk');
-      window.location.href('/auth');
     }
   } catch (error) {
     console.log('what')
