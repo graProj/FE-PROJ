@@ -1,17 +1,19 @@
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { useState } from 'react';
+import { refreshTokenIfNeeded } from './login';
 
 const BACK_SERVER = process.env.REACT_APP_BACK_SERVER;
 
 function useLectureData() {
     const [page, setPage] = useState(1);
     const [size, setSize] = useState(10);
-    const token = localStorage.getItem('token');
+    
 
     const { data, isLoading, error, refetch } = useQuery({
         queryKey: ['lectureData', page, size],
         queryFn: async () => {
+            const token = await refreshTokenIfNeeded();
             const params = {
                 page,
                 size,

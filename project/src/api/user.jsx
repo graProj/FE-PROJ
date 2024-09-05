@@ -1,8 +1,8 @@
 
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { refreshTokenIfNeeded } from './login';
 const BACK_SERVER = process.env.REACT_APP_BACK_SERVER;
-const token = localStorage.getItem('token');
 function UserData() {
   const token = localStorage.getItem('token');
   let Info, id;
@@ -30,7 +30,7 @@ function UserData() {
   return { data, isLoading, error };
 }
 async function Modify(formData) {
-  const token = localStorage.getItem('token');
+  const token = await refreshTokenIfNeeded();
   try {
     const response = await axios.put(`${BACK_SERVER}/api/v1/members`, formData, { headers: { Authorization: `Bearer ${token}` } });
     return { success: true, message: "정보 수정이 완료되었습니다.", data: response.data };
