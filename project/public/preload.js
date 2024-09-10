@@ -41,8 +41,12 @@ contextBridge.exposeInMainWorld('remote', {
     // remoteY = remoteY*(height/(1000*(height/ width)));
     ipcRenderer.send('remote-coordinates', { remoteX, remoteY ,eventType });
   },
-  key: (pressedKey) => { 
-    console.log(pressedKey.charCodeAt(0))
-    ipcRenderer.send('remote-keyPress', pressedKey); //ressedKey를 직접 인자로 전달
+  keyup: (pressedKey) => { 
+    console.log(pressedKey)
+    ipcRenderer.send('keyup', pressedKey); //ressedKey를 직접 인자로 전달
+  },
+  keydown: (pressedKey) => { 
+    console.log(pressedKey)
+    ipcRenderer.send('keydown', pressedKey); //ressedKey를 직접 인자로 전달
   }
 });

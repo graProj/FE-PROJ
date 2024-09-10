@@ -13,14 +13,14 @@ app.whenReady().then(() => {
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    frame:false,
-    resizable:false,
+    // frame:false,
+    // resizable:false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true, // 추가
     },
   });
-  mainWindow.removeMenu();
+  // mainWindow.removeMenu();
   // Ensure this path is correct and points to your React app's entry point
   mainWindow.loadFile(path.join(__dirname, '../build/index.html'));
   if (platform === 'win32') {
@@ -54,29 +54,7 @@ app.whenReady().then(() => {
     console.log(sources)
     return sources[0].id;
 });
-  ipcMain.on('start-drag', (event, initialPosition) => {
-    const { x: startX, y: startY } = initialPosition;
-    const currentWindow = BrowserWindow.fromWebContents(event.sender);
-  
-    const moveListener = (moveEvent) => {
-      const { screenX, screenY } = moveEvent;
-      const offsetX = screenX - startX;
-      const offsetY = screenY - startY;
-  
-      const [currentX, currentY] = currentWindow.getPosition();
-      currentWindow.setPosition(currentX + offsetX, currentY + offsetY);
-    };
-  
-    const stopListener = () => {
-      currentWindow.removeListener('mousemove', moveListener);
-      currentWindow.removeListener('mouseup', stopListener);
-    };
-  
-    currentWindow.on('mousemove', moveListener);
-    currentWindow.on('mouseup', stopListener);
-  });
-  
-
+ 
   mainWindow.webContents.on('did-fail-load', (event, errorCode, errorDescription) => {
     console.error('Failed to load:', errorDescription);
   });
@@ -87,34 +65,40 @@ app.whenReady().then(() => {
     remoteY = remoteY *(height/864);
     
     if (eventType === 'mousedown') {
-      console.log('isMousedown?');
-      // await robot.moveMouse(remoteX, remoteY);
-      // robot.mouseClick("left");
       robot.mouseToggle("down", "left");
     }
     else if (eventType === 'mouseup') {
-      console.log("isMouseUp?");
-      // robot.dragMouse(remoteX, remoteY);
-      // robot.mouseToggle("up");
       robot.mouseToggle("up", "left");
+    }
+    else if (eventType === 'right-mouseup') {
+      robot.mouseToggle("up", "right");
+    }
+    else if (eventType === 'right-mousedown') {
+      robot.mouseToggle("down", "right");
     }
     else if (eventType === 'mousemove') {
       robot.moveMouseSmooth(remoteX, remoteY,1);
     } 
-    else if (eventType === 'contextmenu') {
-      robot.dragMouse(remoteX, remoteY);
-      robot.mouseClick("right");
-    }
+  
   });
-  ipcMain.on('remote-keyPress', (event, String) => {
+  ipcMain.on('keydown', (event, String) => {
+    let pressedKey = String.toLowerCase();
+    let askiiStr = pressedKey.charCodeAt(0);
+    
+    if (pressedKey !== 'meta') {
+      if (askiiStr < 12593 || askiiStr > 12643) {
+        robot.keyToggle(pressedKey, 'down');
+      } else {
+        robot.typeString(pressedKey);
+      };
+    } else return;
+  });
+  ipcMain.on('keyup', (event, String) => {
     let pressedKey = String.toLowerCase();
     let askiiStr = pressedKey.charCodeAt(0);
     if (pressedKey !== 'meta') {
       if (askiiStr < 12593 || askiiStr > 12643) {
-        robot.keyToggle(pressedKey, 'down');
-        setTimeout(() => {
-          robot.keyToggle(pressedKey, 'up');
-        }, 500);
+        robot.keyToggle(pressedKey, 'up');
       } else return;
     } else return;
   });

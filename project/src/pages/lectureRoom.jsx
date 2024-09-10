@@ -17,7 +17,7 @@ function LectureRoom() {
           const milliseconds = Info.exp * 1000;
           const date = new Date(milliseconds);
           const currentTime = new Date();
-          if (date - currentTime < 20 * 1000) {
+          if (date - currentTime < 60 * 1000) {
             await refreshTokenIfNeeded();
           }
           else return;

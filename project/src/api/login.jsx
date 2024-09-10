@@ -53,15 +53,17 @@ const refreshTokenIfNeeded = async () => {
 
       const data = await response.json();
       if (response.status===200) {
+        console.log("재발급")
         localStorage.setItem('token', data.response.accessToken);
         localStorageToken = localStorage.getItem('token');
         return localStorageToken;
       }
       
       else{
+        console.log("오류 : ",response)
         localStorage.removeItem('token');
         localStorage.removeItem('rtk');
-        window.location.hash = '/auth'
+        window.location.hash = '/auth';
       }
     } catch (error) {
       console.log('what')
