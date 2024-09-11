@@ -1,15 +1,24 @@
 const { app, BrowserWindow, ipcMain, desktopCapturer, screen } = require('electron/main');
 const path = require('node:path');
-
+const Inko = require('inko')
 const robot = require("@hurdlegroup/robotjs");
 const os = require('os');
 const platform = os.platform();
-
-
+let isHangul = false;
+let inko = new Inko();
 app.whenReady().then(() => {
+  
   const primaryDisplay = screen.getPrimaryDisplay();
   let width=0;
   let height=0;
+  
+  const dict = {
+    "arrowright" : "right",
+    "arrowleft" : "left",
+    "arrowup" : "up",
+    "arrowdown" : "down",
+  }
+
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -20,6 +29,9 @@ app.whenReady().then(() => {
       nodeIntegration: true, // 추가
     },
   });
+  
+
+
   // mainWindow.removeMenu();
   // Ensure this path is correct and points to your React app's entry point
   mainWindow.loadFile(path.join(__dirname, '../build/index.html'));
@@ -27,7 +39,6 @@ app.whenReady().then(() => {
     const primaryDisplay = screen.getPrimaryDisplay();
     width = primaryDisplay.bounds.width*primaryDisplay.scaleFactor;
     height = primaryDisplay.bounds.height*primaryDisplay.scaleFactor;
-    console.log(width+'awef'+primaryDisplay.scaleFactor)
   } 
   else if (platform === 'darwin') {
     width = primaryDisplay.size.width;
@@ -51,7 +62,6 @@ app.whenReady().then(() => {
   })
   ipcMain.handle('ping', async () => {
     const sources = await desktopCapturer.getSources({ types: ['screen'] });
-    console.log(sources)
     return sources[0].id;
 });
  
@@ -81,26 +91,69 @@ app.whenReady().then(() => {
     } 
   
   });
+   // isHangul을 false로 초기화
   ipcMain.on('keydown', (event, String) => {
-    let pressedKey = String.toLowerCase();
-    let askiiStr = pressedKey.charCodeAt(0);
     
-    if (pressedKey !== 'meta') {
-      if (askiiStr < 12593 || askiiStr > 12643) {
-        robot.keyToggle(pressedKey, 'down');
-      } else {
-        robot.typeString(pressedKey);
-      };
-    } else return;
+    try {
+      let askiiStr;
+      let pressedKey = String.toLowerCase();
+      if(pressedKey.length===1){
+        askiiStr= pressedKey.charCodeAt(0);
+      }
+      else{
+        askiiStr = `\+${pressedKey.charCodeAt(0)}`.charCodeAt(0);
+      }
+      
+      if (pressedKey === 'hangulmode') {
+        isHangul = !isHangul; // 'hangulmode' 키를 눌렀을 때만 isHangul을 토글
+        return;
+      }
+      // 다른 키를 눌렀을 때 isHangul이 변경되지 않도록 함
+      if (pressedKey in dict) {
+        let value = dict[pressedKey];
+        robot.keyToggle(value, 'down');
+        return;
+      }
+      if (pressedKey !== 'meta' && pressedKey !== 'process') {
+        if (askiiStr < 12593 || askiiStr > 12643) {
+          if (isHangul && 33<=askiiStr<=126) {
+            let hangulKey = inko.en2ko(pressedKey);
+            robot.typeString(hangulKey);
+          } else {
+            robot.keyToggle(pressedKey, 'down');
+          }
+        } else {
+          robot.typeString(pressedKey);
+        }
+      }
+    } catch {
+      return;
+    }
   });
   ipcMain.on('keyup', (event, String) => {
-    let pressedKey = String.toLowerCase();
+    try {
+      let pressedKey = String.toLowerCase();
     let askiiStr = pressedKey.charCodeAt(0);
-    if (pressedKey !== 'meta') {
+    if (pressedKey === 'hangulmode') {
+      return;
+    }
+    if(pressedKey in dict){
+      let value = dict[pressedKey];
+      robot.keyToggle(value, 'up');
+      return;
+    }
+    if (pressedKey !== 'meta'||pressedKey !== 'process') {
       if (askiiStr < 12593 || askiiStr > 12643) {
-        robot.keyToggle(pressedKey, 'up');
+        if (isHangul) {
+          return;
+        } else {
+          robot.keyToggle(pressedKey, 'up');
+        }
       } else return;
-    } else return;
+    } else return;}
+    catch{
+      return;
+    }
   });
   ipcMain.on('image', async (event) => {
     try {
@@ -110,7 +163,6 @@ app.whenReady().then(() => {
       event.returnValue = image;
       
     } catch (error) {
-      console.error('Error capturing screen:', error);
       event.returnValue = null;
     }
   });

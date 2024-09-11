@@ -35,18 +35,16 @@ function LectureRoom() {
       }
     };
     setInterval(async () => {
-      console.log("lectureRoom");
       checkTokenValidity();
       let source = await window.display.image();
       sendImage(roomId, source);
-      console.log(source);
     }, 10000);
     useEffect(() => {
       navigate(`/home/room/L${roomId}M${userId}`);
     }, []);
     return (
         <div className="flex bg-black" >
-          
+          aa
         </div>
       );
     }
