@@ -148,6 +148,7 @@ app.whenReady().then(() => {
           return;
         } else {
           robot.keyToggle(pressedKey, 'up');
+          robot.unicodeTap
         }
       } else return;
     } else return;}
@@ -155,7 +156,7 @@ app.whenReady().then(() => {
       return;
     }
   });
-  ipcMain.on('image', async (event) => {
+  ipcMain.on('image', async (event) => {s
     try {
       const sources = await desktopCapturer.getSources({ types: ['window', 'screen'] });
       const source = sources[0];
