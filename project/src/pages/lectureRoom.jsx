@@ -17,7 +17,7 @@ function LectureRoom() {
           const milliseconds = Info.exp * 1000;
           const date = new Date(milliseconds);
           const currentTime = new Date();
-          if (date - currentTime < 20 * 1000) {
+          if (date - currentTime < 60 * 1000) {
             await refreshTokenIfNeeded();
           }
           else return;
@@ -35,18 +35,16 @@ function LectureRoom() {
       }
     };
     setInterval(async () => {
-      console.log("lectureRoom");
       checkTokenValidity();
       let source = await window.display.image();
       sendImage(roomId, source);
-      console.log(source);
     }, 10000);
     useEffect(() => {
       navigate(`/home/room/L${roomId}M${userId}`);
     }, []);
     return (
         <div className="flex bg-black" >
-          
+          aa
         </div>
       );
     }

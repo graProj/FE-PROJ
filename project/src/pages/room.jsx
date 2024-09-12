@@ -18,10 +18,10 @@ export default function Room() {
   };
   const resizeExecuted = useRef(false);
 
-  if (!resizeExecuted.current) {
-    window.display.resize();
-    resizeExecuted.current = true;
-  }
+  // if (!resizeExecuted.current) {
+  //   window.display.resize();
+  //   resizeExecuted.current = true;
+  // }
   let myPeerConnection = new RTCPeerConnection(configuration);
 
   let offer = null;
@@ -149,13 +149,15 @@ export default function Room() {
         var content = JSON.parse(message);
         
         if (content.event === "client_x_coordinate") {
-          if (typeof content.data === 'object') {
-            console.log(content.data)
+          if (content.data.eventType==='mousemove'||content.data.eventType==='mouseup'||content.data.eventType==='mousedown'||content.data.eventType==='right-mouseup'||content.data.eventType==='right-mousedown') {
             await window.remote.source(content.data.x, content.data.y, content.data.eventType);
-          } else  {          
-            await window.remote.key(content.data);
           }
-          
+          else if(content.data.eventType==='keyup'){
+            await window.remote.keyup(content.data.key);
+          }
+          else if(content.data.eventType==='keydown'){
+            await window.remote.keydown(content.data.key);
+          }
         }
       });
       socket.on('kick', async (data) => {
