@@ -34,6 +34,9 @@ export default function Room() {
     window.display.default();
     window.location.reload();
   }
+  const Escape = () => {
+    window.remote.escape('escape')
+  }
   useEffect(() => {
     
     getMedia();
@@ -178,6 +181,7 @@ export default function Room() {
 
   return (
     <div id="box" className="relative bottom-0 left-0 w-screen h-screen bg-black">
+      <Button onClick={Escape}>reset</Button>
       <div id="result"></div>
       <video id="myFace" playsInline autoPlay width="600" height="600" className="hidden"></video>
       <Button onClick={goBack}>돌아가기</Button>

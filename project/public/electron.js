@@ -4,8 +4,7 @@ const Inko = require('inko')
 const robot = require("@hurdlegroup/robotjs");
 const os = require('os');
 const platform = os.platform();
-let isHangul = false;
-let inko = new Inko();
+
 app.whenReady().then(() => {
   
   const primaryDisplay = screen.getPrimaryDisplay();
@@ -18,21 +17,19 @@ app.whenReady().then(() => {
     "arrowup" : "up",
     "arrowdown" : "down",
   }
-
+  let set = new Set()
   mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
-    // frame:false,
-    // resizable:false,
+    frame:false,
+    resizable:false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       nodeIntegration: true, // 추가
     },
   });
-  
-
-
-  // mainWindow.removeMenu();
+  mainWindow.removeMenu();
+  console.log(set)
   // Ensure this path is correct and points to your React app's entry point
   mainWindow.loadFile(path.join(__dirname, '../build/index.html'));
   if (platform === 'win32') {
@@ -93,7 +90,7 @@ app.whenReady().then(() => {
   });
    // isHangul을 false로 초기화
   ipcMain.on('keydown', (event, String) => {
-    
+    console.log(set)
     try {
       let askiiStr;
       let pressedKey = String.toLowerCase();
@@ -105,25 +102,22 @@ app.whenReady().then(() => {
       }
       
       if (pressedKey === 'hangulmode') {
-        isHangul = !isHangul; // 'hangulmode' 키를 눌렀을 때만 isHangul을 토글
         return;
       }
+
       // 다른 키를 눌렀을 때 isHangul이 변경되지 않도록 함
       if (pressedKey in dict) {
         let value = dict[pressedKey];
         robot.keyToggle(value, 'down');
+        set.add(value);
         return;
       }
       if (pressedKey !== 'meta' && pressedKey !== 'process') {
         if (askiiStr < 12593 || askiiStr > 12643) {
-          if (isHangul && 33<=askiiStr<=126) {
-            let hangulKey = inko.en2ko(pressedKey);
-            robot.typeString(hangulKey);
-          } else {
-            robot.keyToggle(pressedKey, 'down');
-          }
+          robot.keyToggle(pressedKey, 'down');
+          set.add(pressedKey);
         } else {
-          robot.typeString(pressedKey);
+          return;
         }
       }
     } catch {
@@ -131,37 +125,41 @@ app.whenReady().then(() => {
     }
   });
   ipcMain.on('keyup', (event, String) => {
+    console.log(set)
     try {
       let pressedKey = String.toLowerCase();
     let askiiStr = pressedKey.charCodeAt(0);
     if (pressedKey === 'hangulmode') {
       return;
     }
+    if(pressedKey ==='escape'){
+      set.forEach((value)=>{
+        robot.keyToggle(value,'up')
+        set.delete(value);
+      })
+    }
     if(pressedKey in dict){
       let value = dict[pressedKey];
       robot.keyToggle(value, 'up');
+      set.delete(value);
       return;
     }
     if (pressedKey !== 'meta'||pressedKey !== 'process') {
       if (askiiStr < 12593 || askiiStr > 12643) {
-        if (isHangul) {
-          return;
-        } else {
-          robot.keyToggle(pressedKey, 'up');
-          robot.unicodeTap
-        }
+        robot.keyToggle(pressedKey, 'up');
+        set.delete(pressedKey);
       } else return;
     } else return;}
     catch{
       return;
     }
   });
-  ipcMain.on('image', async (event) => {s
+  ipcMain.on('image', async (event) => {
     try {
       const sources = await desktopCapturer.getSources({ types: ['window', 'screen'] });
       const source = sources[0];
       const image = source.thumbnail.toDataURL();
-      event.returnValue = image;
+      event.returnValue = image; 
       
     } catch (error) {
       event.returnValue = null;
