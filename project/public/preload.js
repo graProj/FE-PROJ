@@ -42,11 +42,12 @@ contextBridge.exposeInMainWorld('remote', {
     ipcRenderer.send('remote-coordinates', { remoteX, remoteY ,eventType });
   },
   keyup: (pressedKey) => { 
-    console.log(pressedKey)
     ipcRenderer.send('keyup', pressedKey); //ressedKey를 직접 인자로 전달
   },
   keydown: (pressedKey) => { 
-    console.log(pressedKey)
     ipcRenderer.send('keydown', pressedKey); //ressedKey를 직접 인자로 전달
+  },
+  escape: (pressedKey) => {
+    ipcRenderer.send('keyup', pressedKey);
   }
 });
