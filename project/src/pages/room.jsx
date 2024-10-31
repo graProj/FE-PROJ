@@ -4,7 +4,7 @@ import { io } from "socket.io-client";
 import { Button } from "../components/ui/button";
 
 export default function Room() {
-  const socket = io("http://3.38.214.160:5004");
+  const socket = io("http://3.37.88.247:5004");
   const { remoteId } = useParams();
   
   const navigate = useNavigate();
@@ -123,7 +123,6 @@ export default function Room() {
     
           const myFace = document.getElementById("myFace");
           myFace.srcObject = stream;
-
           stream
             .getTracks()
             .forEach((track) => myPeerConnection.addTrack(track, stream));
